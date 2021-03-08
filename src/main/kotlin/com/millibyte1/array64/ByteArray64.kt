@@ -1,42 +1,45 @@
 package com.millibyte1.array64
 
 import com.millibyte1.array64.util.UnsafeUtils
+import it.unimi.dsi.fastutil.BigArrays
 import sun.misc.Unsafe
 
-/*
- * TODO: Implement phantom reference counting and automatic resource management with Java 9's Cleaner utility
- * TODO: Implement parallel processing of elements for efficient aggregate operations and content equality checking
- */
 /**
- * A primitive ByteArray re-implementation using 64-bit indexing.
- *
- * Implemented via direct memory management through the sun.misc.Unsafe class. This means that this is not restricted by
- * the maximum heap space, but rather just by the available RAM.
- *
- * @property size Returns the number of elements in the array.
- * @property address The address of the array in memory.
- *
- * @constructor
- * Creates a new array of the specified [size], where each element is calculated by calling the specified [init] function.
+ * A 64-bit-indexed byte array library
  */
 class ByteArray64 {
 
     val size: Long
-    val address: Long
+    private val array: Array<ByteArray>
 
+    /** Creates a new array of the specified [size], with all elements initialized according to the given [init] function */
     constructor(size: Long, init: (Long) -> Byte) {
-        if(size <= 0) throw IllegalArgumentException("Invalid size provided.")
+        if(size > MAX_SIZE || size <= 0) throw IllegalArgumentException("Invalid size provided.")
         this.size = size
-        address = UnsafeUtils.unsafe.allocateMemory(size)
-        for(i in 0 until size) setInternal(i, init(i))
+        //calculates the number of complete inner arrays and the size of the incomplete last inner array
+        val fullArrays = (size / BigArrays.SEGMENT_SIZE).toInt()
+        val innerSize = (size % BigArrays.SEGMENT_SIZE).toInt()
+        //allocates the array
+        array =
+            if(innerSize == 0) Array(fullArrays) { ByteArray(BigArrays.SEGMENT_SIZE) }
+            else Array(fullArrays + 1) { i -> if(i == fullArrays) ByteArray(innerSize) else ByteArray(BigArrays.SEGMENT_SIZE) }
+        //initializes the elements of the array
+        for(i in 0 until size) this[i] = init(i)
     }
-
     /** Creates a new array of the specified [size], with all elements initialized to zero. */
     constructor(size: Long) : this(size, { 0 })
-    /** Creates a copy of the given array */
-    constructor(array: ByteArray64) : this(array.size, { i -> array[i] })
+    /** Creates a copy of the given FastUtil BigArray */
+    constructor(array: Array<ByteArray>) {
+        this.size = BigArrays.length(array)
+        this.array = BigArrays.copy(array)
+    }
+    /** Creates a copy of the given Array64 */
+    constructor(array: ByteArray64) : this(array.array)
     /** Creates a new array from the given standard library array */
-    constructor(array: ByteArray) : this(array.size.toLong(), { i -> array[i.toInt()] })
+    constructor(array: ByteArray) {
+        this.size = array.size.toLong()
+        this.array = BigArrays.wrap(array)
+    }
 
     fun copy(): ByteArray64 = ByteArray64(this)
 
@@ -44,7 +47,6 @@ class ByteArray64 {
         if(this === other) return true
         if(other !is ByteArray64) return false
         if(size != other.size) return false
-        if(address == other.address) return true
         //this can be done safely but much more efficiently in parallel
         for(i in 0 until size) if(this[i] != other[i]) return false
         return true
@@ -53,24 +55,20 @@ class ByteArray64 {
     /** Returns the array at the given [index]. This method can be called using the index operator. */
     operator fun get(index: Long): Byte {
         if(index >= this.size || index < 0) throw NoSuchElementException()
-        return getInternal(index)
+        return BigArrays.get(array, index)
     }
     /** Sets the element at the given [index] to the given [value]. This method can be called using the index operator. */
     operator fun set(index: Long, value: Byte) {
         if(index >= this.size || index < 0) throw NoSuchElementException()
-        setInternal(index, value)
+        BigArrays.set(array, index, value)
     }
 
     /** Creates an iterator over the elements of the array. */
     operator fun iterator(): ByteIterator = ByteArray64Iterator(this, 0)
 
-    /** Frees this array from the off-heap memory. */
-    fun free() = UnsafeUtils.unsafe.freeMemory(address)
-    /** Gets the byte at the given index in the array without bounds-checking. Significantly faster than checked get. */
-    @PublishedApi internal inline fun getInternal(index: Long): Byte = UnsafeUtils.unsafe.getByte(address + index)
-    /** Sets the byte at the given index in the array without bounds-checking. Singificantly faster than checked set. */
-    @PublishedApi internal inline fun setInternal(index: Long, value: Byte) = UnsafeUtils.unsafe.putByte(address + index, value)
-
+    companion object {
+        const val MAX_SIZE = BigArrays.SEGMENT_SIZE.toLong() * Int.MAX_VALUE
+    }
 }
 
 /** Simple forward iterator implementation for a ByteArray64 */
@@ -166,9 +164,9 @@ inline fun <R, C : MutableCollection<in R>> ByteArray64.mapIndexedTo(destination
 }
 /** Performs the given [action] on each element. */
 inline fun ByteArray64.forEach(action: (Byte) -> Unit) {
-    for(i in this.indices) action(getInternal(i))
+    for(i in this.indices) action(this[i])
 }
 /** Performs the given [action] on each element, providing sequential index with the element. */
 inline fun ByteArray64.forEachIndexed(action: (index: Long, Byte) -> Unit) {
-    for(i in this.indices) action(i, getInternal(i))
+    for(i in this.indices) action(i, this[i])
 }

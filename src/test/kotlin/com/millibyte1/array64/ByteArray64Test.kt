@@ -73,7 +73,7 @@ class ByteArray64Test {
         println("time2: $time2")
     }
     @Test
-    @Order(5)
+    @Order(0)
     fun testSequentialAccessTimes() {
         //TODO: figure out exactly why 2D arrays work so much faster for large arrays
         val array = ByteArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
@@ -84,13 +84,20 @@ class ByteArray64Test {
         val time2 = measureTimeMillis {
             array32.forEachIndexed { i, e -> assertEquals(e, (i % 8).toByte()) }
         }
+        val time3 = measureTimeMillis {
+            val foo = array[0]
+            for(i in 0 until array.size) {
+                assertEquals(foo, 0)
+            }
+        }
         println("time1: $time1")
         println("time2: $time2")
+        println("time3: $time3")
     }
 
     companion object {
         const val TEST_SMALL_ARRAY_SIZE = BigArrays.SEGMENT_SIZE.toLong()
-        const val TEST_MEDIUM_ARRAY_SIZE = BigArrays.SEGMENT_SIZE.toLong() * 8
+        const val TEST_MEDIUM_ARRAY_SIZE = BigArrays.SEGMENT_SIZE.toLong() * 2
         const val TEST_LARGE_ARRAY_SIZE = Int.MAX_VALUE.toLong() - 8
     }
 

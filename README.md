@@ -17,7 +17,9 @@ Simply replace your Ints with Longs and you have working code.
 ## Important Notes
 - Never directly iterate over the indices or elements of an Array64.
 Instead use forEach and forEachInRange.
-- Use the provided higher order functions for collections processing when possible.
+- It is highly recommended that you use the provided higher order functions whenever applicable for performance reasons.
 - In the unlikely event none of the provided functions suit your needs, the internal 2D array is accessible as part of
 the published API. Refer to the [FastUtil documentation](https://fastutil.di.unimi.it/docs/it/unimi/dsi/fastutil/BigArrays.html)
 for usage notes.
+- Random access will always be significantly slower than in a standard library array. An alternative implementation using
+sun.misc.Unsafe could perform better (around 2x speed, naively) for random access but would be *much* slower for sequential access.

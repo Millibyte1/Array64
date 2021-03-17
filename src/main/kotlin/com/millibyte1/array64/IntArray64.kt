@@ -93,6 +93,44 @@ class IntArray64 {
             }
         }
     }
+    /** Performs the given [action] on each element within the [range]. */
+    inline fun forEachInRange(range: LongRange, action: (Int) -> Unit) {
+        if(range.first < 0 || range.last >= this.size) throw NoSuchElementException()
+        //Calculates the indices of the first and last elements in the range
+        val outerIndexOfFirst = BigArrays.segment(range.first)
+        val outerIndexOfLast = BigArrays.segment(range.last)
+        val innerIndexOfFirst = (range.first - (BigArrays.SEGMENT_SIZE * outerIndexOfFirst)).toInt()
+        val innerIndexOfLast = (range.last - (BigArrays.SEGMENT_SIZE * outerIndexOfLast)).toInt()
+        //Performs the iteration
+        for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
+            val inner = array[outerIndex]
+            val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
+            val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
+            for(innerIndex in startingInnerIndex..endingInnerIndex) {
+                action(inner[innerIndex])
+            }
+        }
+    }
+    /** Performs the given [action] on each element within the [range], providing sequential index with the element. */
+    inline fun forEachInRangeIndexed(range: LongRange, action: (index: Long, Int) -> Unit) {
+        if(range.first < 0 || range.last >= this.size) throw NoSuchElementException()
+        //Calculates the indices of the first and last elements in the range
+        val outerIndexOfFirst = BigArrays.segment(range.first)
+        val outerIndexOfLast = BigArrays.segment(range.last)
+        val innerIndexOfFirst = (range.first - (BigArrays.SEGMENT_SIZE * outerIndexOfFirst)).toInt()
+        val innerIndexOfLast = (range.last - (BigArrays.SEGMENT_SIZE * outerIndexOfLast)).toInt()
+        //Performs the iteration
+        var index = range.first
+        for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
+            val inner = array[outerIndex]
+            val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
+            val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
+            for(innerIndex in startingInnerIndex..endingInnerIndex) {
+                action(index, inner[innerIndex])
+                index++
+            }
+        }
+    }
 
     /** Creates an iterator over the elements of the array. */
     operator fun iterator(): IntIterator = IntArray64Iterator(this, 0)
@@ -106,32 +144,4 @@ class IntArray64 {
 private class IntArray64Iterator(val array: IntArray64, var index: Long) : IntIterator() {
     override fun hasNext(): Boolean = index < array.size
     override fun nextInt(): Int = if(index < array.size) array[++index] else throw NoSuchElementException()
-}
-
-/** Returns the last valid index for the array. */
-val IntArray64.lastIndex: Long
-    get() = size - 1
-/** Returns the range of valid indices for the array. */
-val IntArray64.indices: LongRange
-    get() = LongRange(0, lastIndex)
-
-/** Creates an [Iterable] instance that wraps the original array returning its elements when being iterated. */
-fun IntArray64.asIterable(): Iterable<Int> = Iterable { this.iterator() }
-/** Creates a [Sequence] instance that wraps the original array returning its elements when being iterated. */
-fun IntArray64.asSequence(): Sequence<Int> = Sequence { this.iterator() }
-
-/** Returns true if all elements match the given [predicate]. */
-inline fun IntArray64.all(predicate: (Int) -> Boolean): Boolean {
-    this.forEach { e -> if(!predicate(e)) return false }
-    return true
-}
-/** Returns true if at least one element matches the given [predicate]. */
-inline fun IntArray64.any(predicate: (Int) -> Boolean): Boolean {
-    this.forEach { e -> if(predicate(e)) return true }
-    return false
-}
-/** Returns true if no elements match the given [predicate]. */
-inline fun IntArray64.none(predicate: (Int) -> Boolean): Boolean {
-    this.forEach { e -> if(predicate(e)) return false }
-    return true
 }

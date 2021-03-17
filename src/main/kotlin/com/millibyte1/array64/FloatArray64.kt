@@ -93,6 +93,44 @@ class FloatArray64 {
             }
         }
     }
+    /** Performs the given [action] on each element within the [range]. */
+    inline fun forEachInRange(range: LongRange, action: (Float) -> Unit) {
+        if(range.first < 0 || range.last >= this.size) throw NoSuchElementException()
+        //Calculates the indices of the first and last elements in the range
+        val outerIndexOfFirst = BigArrays.segment(range.first)
+        val outerIndexOfLast = BigArrays.segment(range.last)
+        val innerIndexOfFirst = (range.first - (BigArrays.SEGMENT_SIZE * outerIndexOfFirst)).toInt()
+        val innerIndexOfLast = (range.last - (BigArrays.SEGMENT_SIZE * outerIndexOfLast)).toInt()
+        //Performs the iteration
+        for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
+            val inner = array[outerIndex]
+            val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
+            val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
+            for(innerIndex in startingInnerIndex..endingInnerIndex) {
+                action(inner[innerIndex])
+            }
+        }
+    }
+    /** Performs the given [action] on each element within the [range], providing sequential index with the element. */
+    inline fun forEachInRangeIndexed(range: LongRange, action: (index: Long, Float) -> Unit) {
+        if(range.first < 0 || range.last >= this.size) throw NoSuchElementException()
+        //Calculates the indices of the first and last elements in the range
+        val outerIndexOfFirst = BigArrays.segment(range.first)
+        val outerIndexOfLast = BigArrays.segment(range.last)
+        val innerIndexOfFirst = (range.first - (BigArrays.SEGMENT_SIZE * outerIndexOfFirst)).toInt()
+        val innerIndexOfLast = (range.last - (BigArrays.SEGMENT_SIZE * outerIndexOfLast)).toInt()
+        //Performs the iteration
+        var index = range.first
+        for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
+            val inner = array[outerIndex]
+            val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
+            val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
+            for(innerIndex in startingInnerIndex..endingInnerIndex) {
+                action(index, inner[innerIndex])
+                index++
+            }
+        }
+    }
 
     /** Creates an iterator over the elements of the array. */
     operator fun iterator(): FloatIterator = FloatArray64Iterator(this, 0)

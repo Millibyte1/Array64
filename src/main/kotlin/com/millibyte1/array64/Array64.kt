@@ -11,25 +11,25 @@ import it.unimi.dsi.fastutil.BigArrays
  * @property array the 2D array used internally. This should not be used except by extension functions.
  *
  */
-class Array64<T> {
+class Array64<E> {
 
     val size: Long
-    @PublishedApi internal val array: Array<Array<T>>
+    @PublishedApi internal val array: Array<Array<E>>
 
     /** Creates a copy of the given FastUtil BigArray. */
-    constructor(array: Array<Array<T>>) {
+    constructor(array: Array<Array<E>>) {
         this.size = BigArrays.length(array)
         this.array = BigArrays.copy(array)
     }
     /** Creates a copy of the given Array64. */
-    constructor(array: Array64<T>) : this(array.array)
+    constructor(array: Array64<E>) : this(array.array)
     /** Creates a new array from the given standard library array. */
-    constructor(array: Array<T>) {
+    constructor(array: Array<E>) {
         this.size = array.size.toLong()
         this.array = BigArrays.wrap(array)
     }
 
-    fun copy(): Array64<T> = Array64(this)
+    fun copy(): Array64<E> = Array64(this)
 
     infix fun contentEquals(other: Any?): Boolean {
         if(this === other) return true
@@ -41,7 +41,7 @@ class Array64<T> {
     }
 
     /** Returns the element at the given [index]. This method can be called using the index operator. */
-    operator fun get(index: Long): T {
+    operator fun get(index: Long): E {
         if(index >= this.size || index < 0) throw NoSuchElementException()
         return BigArrays.get(array, index)
     }
@@ -52,7 +52,7 @@ class Array64<T> {
     }
 
     /** Performs the given [action] on each element. */
-    inline fun forEach(action: (T) -> Unit) {
+    inline fun forEach(action: (E) -> Unit) {
         //applies the action to each element using a cache-aware iteration
         for(inner in array) {
             for(element in inner) {
@@ -61,7 +61,7 @@ class Array64<T> {
         }
     }
     /** Performs the given [action] on each element, providing sequential index with the element. */
-    inline fun forEachIndexed(action: (index: Long, T) -> Unit) {
+    inline fun forEachIndexed(action: (index: Long, E) -> Unit) {
         //applies the action to each element using a cache-aware iteration
         var index = 0L
         for(inner in array) {
@@ -72,7 +72,7 @@ class Array64<T> {
         }
     }
     /** Performs the given [action] on each element within the [range]. */
-    inline fun forEachInRange(range: LongRange, action: (T) -> Unit) {
+    inline fun forEachInRange(range: LongRange, action: (E) -> Unit) {
         if(range.first < 0 || range.last >= this.size) throw NoSuchElementException()
         //Calculates the indices of the first and last elements in the range
         val outerIndexOfFirst = BigArrays.segment(range.first)
@@ -90,7 +90,7 @@ class Array64<T> {
         }
     }
     /** Performs the given [action] on each element within the [range], providing sequential index with the element. */
-    inline fun forEachInRangeIndexed(range: LongRange, action: (index: Long, T) -> Unit) {
+    inline fun forEachInRangeIndexed(range: LongRange, action: (index: Long, E) -> Unit) {
         if(range.first < 0 || range.last >= this.size) throw NoSuchElementException()
         //Calculates the indices of the first and last elements in the range
         val outerIndexOfFirst = BigArrays.segment(range.first)
@@ -111,7 +111,7 @@ class Array64<T> {
     }
 
     /** Creates an iterator over the elements of the array. */
-    operator fun iterator(): Iterator<T> = Array64Iterator(this, 0)
+    operator fun iterator(): Iterator<E> = Array64Iterator(this)
 
     companion object {
 
@@ -123,12 +123,15 @@ class Array64<T> {
          * This is a pseudo-constructor. Reified type parameters are needed for generic 2D array creation but aren't possible
          * with real constructors, so an inlined operator function is used to act like a constructor.
          */
-        inline operator fun <reified T> invoke(size: Long, crossinline init: (Long) -> T): Array64<T> = makeTypedArray64(size, init)
+        inline operator fun <reified E> invoke(size: Long, crossinline init: (Long) -> E): Array64<E> = makeTypedArray64(size, init)
     }
 }
 
 /** Simple forward iterator implementation for a ByteArray64 */
-private class Array64Iterator<T>(val array: Array64<T>, var index: Long) : Iterator<T> {
+private class Array64Iterator<E>(val array: Array64<E>) : Iterator<E> {
+    var index = 0L
     override fun hasNext(): Boolean = index < array.size
-    override fun next(): T = if(index < array.size) array[++index] else throw NoSuchElementException()
+    override fun next(): E = if(index < array.size) array[index++] else throw NoSuchElementException()
 }
+
+

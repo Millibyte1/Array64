@@ -1,12 +1,11 @@
 package com.millibyte1.array64
 
-import com.millibyte1.array64.ByteArray64
 import it.unimi.dsi.fastutil.BigArrays
 
 /** Creates a generic array instance with the given size and initializer. */
-inline fun <reified T> makeTypedArray(size: Int, init: (Int) -> T): Array<T> = Array(size) { i -> init(i) }
+inline fun <reified E> makeTypedArray(size: Int, init: (Int) -> E): Array<E> = Array(size) { i -> init(i) }
 /** Creates a generic [Array64] with the given size and initializer. */
-inline fun <reified T> makeTypedArray64(size: Long, crossinline init: (Long) -> T): Array64<T> {
+inline fun <reified E> makeTypedArray64(size: Long, crossinline init: (Long) -> E): Array64<E> {
     //determines the number of completely filled inner arrays and the size of the last, unfilled inner array (0 if all arrays are full)
     val fullArrays = (size / BigArrays.SEGMENT_SIZE).toInt()
     val lastInnerSize = (size % BigArrays.SEGMENT_SIZE).toInt()
@@ -15,12 +14,12 @@ inline fun <reified T> makeTypedArray64(size: Long, crossinline init: (Long) -> 
         if(lastInnerSize == 0) Array(fullArrays) { BigArrays.SEGMENT_SIZE }
         else Array(fullArrays + 1) { index -> if(index == fullArrays) lastInnerSize else BigArrays.SEGMENT_SIZE }
     //creates an equivalent initializer which takes inner and outer indices instead of just a single long index
-    val fakeInit: (Int, Int) -> T = { outerIndex, innerIndex -> init((outerIndex * BigArrays.SEGMENT_SIZE + innerIndex).toLong()) }
+    val fakeInit: (Int, Int) -> E = { outerIndex, innerIndex -> init((outerIndex * BigArrays.SEGMENT_SIZE + innerIndex).toLong()) }
     //creates and returns a 2D array using the fakeInit function
     return Array64(makeTyped2DArray(innerSizes, fakeInit))
 }
 /** Creates a generic 2D array with sizes defined by [innerSizes] and elements initialized according to the provided [init] function. */
-inline fun <reified T> makeTyped2DArray(innerSizes: Array<Int>, init: (Int, Int) -> T): Array<Array<T>> {
+inline fun <reified E> makeTyped2DArray(innerSizes: Array<Int>, init: (Int, Int) -> E): Array<Array<E>> {
     return Array(innerSizes.size) { outerIndex ->
         Array(innerSizes[outerIndex]) { innerIndex ->
             init(outerIndex, innerIndex)

@@ -19,26 +19,26 @@ import kotlin.test.assertFalse
 class Array64Test {
 
     @Test
-    @Order(0)
+    @Order(1)
     fun testGet() {
         val array = Array64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
         array.forEachIndexed { i, e -> assertEquals(e, (i % 8).toByte()) }
         
     }
     @Test
-    @Order(1)
+    @Order(2)
     fun testSet() {
         val array = Array64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
         array.forEachIndexed {
-                i, e -> run {
-            array[i] = (e - 1).toByte()
-            assertNotEquals(e, array[i])
-            array[i] = e
-        }
+            i, e -> run {
+                array[i] = (e - 1).toByte()
+                assertNotEquals(e, array[i])
+                array[i] = e
+            }
         }
     }
     @Test
-    @Order(2)
+    @Order(3)
     fun testForEachInRange() {
         val array = Array64(TEST_MEDIUM_ARRAY_SIZE) { 0.toByte() }
         array[0] = 1
@@ -51,7 +51,7 @@ class Array64Test {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     fun testCopy() {
         //I don't have the RAM to test copy with even one full inner array
         val array = Array64(10000000) { i -> (i % 8).toByte() }
@@ -65,7 +65,7 @@ class Array64Test {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     fun testRandomAccessTimes() {
         val random = Random(-234013250)
         val array = Array64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
@@ -85,7 +85,7 @@ class Array64Test {
         println("time2: $time2")
     }
     @Test
-    @Order(5)
+    @Order(6)
     fun testSequentialAccessTimes() {
         val array = Array64(10000000) { i -> (i % 8).toByte() }
         val time1 = measureTimeMillis {
@@ -106,8 +106,20 @@ class Array64Test {
         println("time3: $time3")
     }
 
+    @Test
+    @Order(0)
+    fun testIterator() {
+        val array = Array64(TEST_SMALL_ARRAY_SIZE) { i -> (i % 8).toByte() }
+        val iterator = array.iterator()
+        var i = 0
+        for(e in iterator) {
+            assertEquals(e, (i % 8).toByte())
+            i++
+        }
+    }
+
     companion object {
-        const val TEST_SMALL_ARRAY_SIZE = BigArrays.SEGMENT_SIZE.toLong()
+        const val TEST_SMALL_ARRAY_SIZE = BigArrays.SEGMENT_SIZE.toLong() + 1
         const val TEST_MEDIUM_ARRAY_SIZE = BigArrays.SEGMENT_SIZE.toLong() * 2
         const val TEST_LARGE_ARRAY_SIZE = Int.MAX_VALUE.toLong() - 8
     }

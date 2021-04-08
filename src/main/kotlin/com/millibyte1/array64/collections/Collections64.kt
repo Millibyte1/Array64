@@ -13,9 +13,9 @@ interface Collection64<out E> : Iterable<E> {
     /** Checks if the specified element is contained in this collection. */
     operator fun contains(element: @UnsafeVariance E): Boolean
     /** Checks if all elements in the specified collection are contained in this collection. */
-    fun containsAll(element: Collection<@UnsafeVariance E>): Boolean
+    fun containsAll(elements: Collection<@UnsafeVariance E>): Boolean
     /** Checks if all elements in the specified collection are contained in this collection. */
-    fun containsAll(element: Collection64<@UnsafeVariance E>): Boolean
+    fun containsAll(elements: Collection64<@UnsafeVariance E>): Boolean
     /** Returns `true` if this collection is empty (contains no elements), `false` otherwise. */
     fun isEmpty(): Boolean
 }
@@ -119,3 +119,8 @@ interface MutableList64<E> : List64<E>, MutableCollection64<E> {
 }
 val Collection64<*>.indices: LongRange
     get() = (0 until size)
+val List64<*>.lastIndex: Long
+    get() = size - 1
+
+/** Returns `true` if this collection is not empty (contains elements), `false` otherwise. */
+inline fun Collection64<*>.isNotEmpty(): Boolean = !isEmpty()

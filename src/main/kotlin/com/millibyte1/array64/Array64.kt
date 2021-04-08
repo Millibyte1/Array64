@@ -7,8 +7,8 @@ import it.unimi.dsi.fastutil.BigArrays
  *
  * Internally uses a 2D array and the FastUtil [BigArrays] library.
  *
- * @property size the number of elements in this array
- * @property array the 2D array used internally. This should not be used except by extension functions.
+ * @property size the number of elements in this array.
+ * @property array the 2D array used internally. This should not be used except when extending the API.
  *
  */
 class Array64<E> {
@@ -46,7 +46,7 @@ class Array64<E> {
         return BigArrays.get(array, index)
     }
     /** Sets the element at the given [index] to the given [value]. This method can be called using the index operator. */
-    operator fun set(index: Long, value: Byte) {
+    operator fun set(index: Long, value: E) {
         if(index >= this.size || index < 0) throw NoSuchElementException()
         BigArrays.set(array, index, value)
     }
@@ -110,9 +110,6 @@ class Array64<E> {
         }
     }
 
-    /** Creates an iterator over the elements of the array. */
-    operator fun iterator(): Iterator<E> = Array64Iterator(this)
-
     companion object {
 
         const val MAX_SIZE = BigArrays.SEGMENT_SIZE.toLong() * Int.MAX_VALUE
@@ -126,12 +123,3 @@ class Array64<E> {
         inline operator fun <reified E> invoke(size: Long, crossinline init: (Long) -> E): Array64<E> = makeTypedArray64(size, init)
     }
 }
-
-/** Simple forward iterator implementation for a ByteArray64 */
-private class Array64Iterator<E>(val array: Array64<E>) : Iterator<E> {
-    var index = 0L
-    override fun hasNext(): Boolean = index < array.size
-    override fun next(): E = if(index < array.size) array[index++] else throw NoSuchElementException()
-}
-
-

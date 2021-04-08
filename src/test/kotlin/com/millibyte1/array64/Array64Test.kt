@@ -21,9 +21,8 @@ class Array64Test {
     @Test
     @Order(1)
     fun testGet() {
-        val array = Array64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
+        val array = Array64(TEST_SMALL_ARRAY_SIZE) { i -> (i % 8).toByte() }
         array.forEachIndexed { i, e -> assertEquals(e, (i % 8).toByte()) }
-        
     }
     @Test
     @Order(2)
@@ -106,22 +105,9 @@ class Array64Test {
         println("time3: $time3")
     }
 
-    @Test
-    @Order(0)
-    fun testIterator() {
-        val array = Array64(TEST_SMALL_ARRAY_SIZE) { i -> (i % 8).toByte() }
-        val iterator = array.iterator()
-        var i = 0
-        for(e in iterator) {
-            assertEquals(e, (i % 8).toByte())
-            i++
-        }
-    }
-
     companion object {
         const val TEST_SMALL_ARRAY_SIZE = BigArrays.SEGMENT_SIZE.toLong() + 1
         const val TEST_MEDIUM_ARRAY_SIZE = BigArrays.SEGMENT_SIZE.toLong() * 2
         const val TEST_LARGE_ARRAY_SIZE = Int.MAX_VALUE.toLong() - 8
     }
-
 }

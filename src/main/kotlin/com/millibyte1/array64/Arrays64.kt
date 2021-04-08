@@ -5,18 +5,20 @@ import it.unimi.dsi.fastutil.BigArrays
 /** Creates a generic array instance with the given size and initializer. */
 inline fun <reified E> makeTypedArray(size: Int, init: (Int) -> E): Array<E> = Array(size) { i -> init(i) }
 /** Creates a generic [Array64] with the given size and initializer. */
-inline fun <reified E> makeTypedArray64(size: Long, crossinline init: (Long) -> E): Array64<E> {
+inline fun <reified E> makeTypedArray64(size: Long, crossinline init: (Long) -> E): Array64<E> = Array64(makeTyped2DArray(size, init))
+/** Creates a generic 2D array with the given size and initializer and inner arrays filled up to [BigArrays.SEGMENT_SIZE] */
+inline fun <reified E> makeTyped2DArray(size: Long, crossinline init: (Long) -> E): Array<Array<E>> {
     //determines the number of completely filled inner arrays and the size of the last, unfilled inner array (0 if all arrays are full)
     val fullArrays = (size / BigArrays.SEGMENT_SIZE).toInt()
     val lastInnerSize = (size % BigArrays.SEGMENT_SIZE).toInt()
     //creates an array storing the size of the inner array at each index
     val innerSizes =
-        if(lastInnerSize == 0) Array(fullArrays) { BigArrays.SEGMENT_SIZE }
-        else Array(fullArrays + 1) { index -> if(index == fullArrays) lastInnerSize else BigArrays.SEGMENT_SIZE }
+            if(lastInnerSize == 0) Array(fullArrays) { BigArrays.SEGMENT_SIZE }
+            else Array(fullArrays + 1) { index -> if(index == fullArrays) lastInnerSize else BigArrays.SEGMENT_SIZE }
     //creates an equivalent initializer which takes inner and outer indices instead of just a single long index
     val fakeInit: (Int, Int) -> E = { outerIndex, innerIndex -> init((outerIndex * BigArrays.SEGMENT_SIZE + innerIndex).toLong()) }
     //creates and returns a 2D array using the fakeInit function
-    return Array64(makeTyped2DArray(innerSizes, fakeInit))
+    return makeTyped2DArray(innerSizes, fakeInit)
 }
 /** Creates a generic 2D array with sizes defined by [innerSizes] and elements initialized according to the provided [init] function. */
 inline fun <reified E> makeTyped2DArray(innerSizes: Array<Int>, init: (Int, Int) -> E): Array<Array<E>> {

@@ -16,18 +16,18 @@ import kotlin.test.assertTrue
 import kotlin.test.assertFalse
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-class ByteArray64Test {
+class SafeByteArray64Test {
 
     @Test
     @Order(0)
     fun testGet() {
-        val array = ByteArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
+        val array = SafeByteArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
         array.forEachIndexed { i, e -> assertEquals(e, (i % 8).toByte()) }
     }
     @Test
     @Order(1)
     fun testSet() {
-        val array = ByteArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
+        val array = SafeByteArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
         array.forEachIndexed {
             i, e -> run {
                 array[i] = (e - 1).toByte()
@@ -39,7 +39,7 @@ class ByteArray64Test {
     @Test
     @Order(2)
     fun testForEachInRange() {
-        val array = ByteArray64(TEST_MEDIUM_ARRAY_SIZE) { 0 }
+        val array = SafeByteArray64(TEST_MEDIUM_ARRAY_SIZE) { 0 }
         array[0] = 1
         array[5] = 1
         array[TEST_SMALL_ARRAY_SIZE + 3] = 1
@@ -52,7 +52,7 @@ class ByteArray64Test {
     @Test
     @Order(3)
     fun testCopy() {
-        val array = ByteArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
+        val array = SafeByteArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
         val copy = array.copy()
         assertEquals(array.size, copy.size)
         assertTrue(array.contentEquals(copy))
@@ -66,7 +66,7 @@ class ByteArray64Test {
     @Order(4)
     fun testRandomAccessTimes() {
         val random = Random(-234013250)
-        val array = ByteArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
+        val array = SafeByteArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
         val indices = LongArray(10000000) { random.nextLong(10000000) }
         val time1 = measureTimeMillis {
             for(i in indices) {
@@ -85,7 +85,7 @@ class ByteArray64Test {
     @Test
     @Order(5)
     fun testSequentialAccessTimes() {
-        val array = ByteArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
+        val array = SafeByteArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
         val time1 = measureTimeMillis {
             array.forEachIndexed { i, e -> assertEquals(e, (i % 8).toByte()) }
         }

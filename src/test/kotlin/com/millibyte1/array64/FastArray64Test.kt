@@ -16,18 +16,18 @@ import kotlin.test.assertTrue
 import kotlin.test.assertFalse
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-class SafeArray64Test {
+class FastArray64Test {
 
     @Test
     @Order(1)
     fun testGet() {
-        val array = SafeArray64(TEST_SMALL_ARRAY_SIZE) { i -> (i % 8).toByte() }
+        val array = FastArray64(TEST_SMALL_ARRAY_SIZE) { i -> (i % 8).toByte() }
         array.forEachIndexed { i, e -> assertEquals(e, (i % 8).toByte()) }
     }
     @Test
     @Order(2)
     fun testSet() {
-        val array = SafeArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
+        val array = FastArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
         array.forEachIndexed {
             i, e -> run {
                 array[i] = (e - 1).toByte()
@@ -39,7 +39,7 @@ class SafeArray64Test {
     @Test
     @Order(3)
     fun testForEachInRange() {
-        val array = SafeArray64(TEST_MEDIUM_ARRAY_SIZE) { 0.toByte() }
+        val array = FastArray64(TEST_MEDIUM_ARRAY_SIZE) { 0.toByte() }
         array[0] = 1
         array[5] = 1
         array[TEST_SMALL_ARRAY_SIZE + 3] = 1
@@ -53,7 +53,7 @@ class SafeArray64Test {
     @Order(4)
     fun testCopy() {
         //I don't have the RAM to test copy with even one full inner array
-        val array = SafeArray64(10000000) { i -> (i % 8).toByte() }
+        val array = FastArray64(10000000) { i -> (i % 8).toByte() }
         val copy = array.copy()
         assertEquals(array.size, copy.size)
         assertTrue(array.contentEquals(copy))
@@ -67,7 +67,7 @@ class SafeArray64Test {
     @Order(5)
     fun testRandomAccessTimes() {
         val random = Random(-234013250)
-        val array = SafeArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
+        val array = FastArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
         val indices = LongArray(10000000) { random.nextLong(10000000) }
         val time1 = measureTimeMillis {
             for(i in indices) {
@@ -86,7 +86,7 @@ class SafeArray64Test {
     @Test
     @Order(6)
     fun testSequentialAccessTimes() {
-        val array = SafeArray64(10000000) { i -> (i % 8).toByte() }
+        val array = FastArray64(10000000) { i -> (i % 8).toByte() }
         val time1 = measureTimeMillis {
             array.forEachIndexed { i, e -> assertEquals(e, (i % 8).toByte()) }
         }

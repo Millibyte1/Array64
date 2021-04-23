@@ -4,8 +4,8 @@ import it.unimi.dsi.fastutil.BigArrays
 
 /** Creates a generic array instance with the given size and initializer. */
 inline fun <reified E> makeTypedArray(size: Int, init: (Int) -> E): Array<E> = Array(size) { i -> init(i) }
-/** Creates a generic [SafeArray64] with the given size and initializer. */
-inline fun <reified E> makeTypedArray64(size: Long, crossinline init: (Long) -> E): SafeArray64<E> = SafeArray64(makeTyped2DArray(size, init))
+/** Creates a generic [FastArray64] with the given size and initializer. */
+inline fun <reified E> makeTypedArray64(size: Long, crossinline init: (Long) -> E): FastArray64<E> = FastArray64(makeTyped2DArray(size, init))
 /** Creates a generic 2D array with the given size and initializer and inner arrays filled up to [BigArrays.SEGMENT_SIZE] */
 inline fun <reified E> makeTyped2DArray(size: Long, crossinline init: (Long) -> E): Array<Array<E>> {
     //determines the number of completely filled inner arrays and the size of the last, unfilled inner array (0 if all arrays are full)
@@ -322,28 +322,28 @@ inline fun DoubleArray64.forEachInRangeIndexed(range: LongRange, action: (index:
 
 // TODO: Old stuff
 /** Returns the last valid index for the array. */
-val SafeByteArray64.lastIndex: Long
+val FastByteArray64.lastIndex: Long
     get() = size - 1
 /** Returns the range of valid indices for the array. */
-val SafeByteArray64.indices: LongRange
+val FastByteArray64.indices: LongRange
     get() = LongRange(0, lastIndex)
 /** Returns the last valid index for the array. */
-val SafeShortArray64.lastIndex: Long
+val FastShortArray64.lastIndex: Long
     get() = size - 1
 /** Returns the range of valid indices for the array. */
-val SafeShortArray64.indices: LongRange
+val FastShortArray64.indices: LongRange
     get() = LongRange(0, lastIndex)
 /** Returns the last valid index for the array. */
-val SafeIntArray64.lastIndex: Long
+val FastIntArray64.lastIndex: Long
     get() = size - 1
 /** Returns the range of valid indices for the array. */
-val SafeIntArray64.indices: LongRange
+val FastIntArray64.indices: LongRange
     get() = LongRange(0, lastIndex)
 /** Returns the last valid index for the array. */
-val SafeLongArray64.lastIndex: Long
+val FastLongArray64.lastIndex: Long
     get() = size - 1
 /** Returns the range of valid indices for the array. */
-val SafeLongArray64.indices: LongRange
+val FastLongArray64.indices: LongRange
     get() = LongRange(0, lastIndex)
 /** Returns the last valid index for the array. */
 val SafeFloatArray64.lastIndex: Long
@@ -358,19 +358,19 @@ val SafeDoubleArray64.lastIndex: Long
 val SafeDoubleArray64.indices: LongRange
     get() = LongRange(0, lastIndex)
 /** Returns the last valid index for the array. */
-val SafeBooleanArray64.lastIndex: Long
+val FastBooleanArray64.lastIndex: Long
     get() = size - 1
 /** Returns the range of valid indices for the array. */
-val SafeBooleanArray64.indices: LongRange
+val FastBooleanArray64.indices: LongRange
     get() = LongRange(0, lastIndex)
 /** Returns the last valid index for the array. */
-val SafeCharArray64.lastIndex: Long
+val FastCharArray64.lastIndex: Long
     get() = size - 1
 /** Returns the range of valid indices for the array. */
-val SafeCharArray64.indices: LongRange
+val FastCharArray64.indices: LongRange
     get() = LongRange(0, lastIndex)
 /** Performs the given [action] on each element. */
-inline fun <E> SafeArray64<E>.forEach(action: (E) -> Unit) {
+inline fun <E> FastArray64<E>.forEach(action: (E) -> Unit) {
     //applies the action to each element using a cache-aware iteration
     for(inner in array) {
         for(element in inner) {
@@ -379,7 +379,7 @@ inline fun <E> SafeArray64<E>.forEach(action: (E) -> Unit) {
     }
 }
 /** Performs the given [action] on each element, providing sequential index with the element. */
-inline fun <E> SafeArray64<E>.forEachIndexed(action: (index: Long, E) -> Unit) {
+inline fun <E> FastArray64<E>.forEachIndexed(action: (index: Long, E) -> Unit) {
     //applies the action to each element using a cache-aware iteration
     var index = 0L
     for(inner in array) {
@@ -390,7 +390,7 @@ inline fun <E> SafeArray64<E>.forEachIndexed(action: (index: Long, E) -> Unit) {
     }
 }
 /** Performs the given [action] on each element within the [range]. */
-inline fun <E> SafeArray64<E>.forEachInRange(range: LongRange, action: (E) -> Unit) {
+inline fun <E> FastArray64<E>.forEachInRange(range: LongRange, action: (E) -> Unit) {
     if(range.first < 0 || range.last >= this.size) throw NoSuchElementException()
     //Calculates the indices of the first and last elements in the range
     val outerIndexOfFirst = BigArrays.segment(range.first)
@@ -408,7 +408,7 @@ inline fun <E> SafeArray64<E>.forEachInRange(range: LongRange, action: (E) -> Un
     }
 }
 /** Performs the given [action] on each element within the [range], providing sequential index with the element. */
-inline fun <E> SafeArray64<E>.forEachInRangeIndexed(range: LongRange, action: (index: Long, E) -> Unit) {
+inline fun <E> FastArray64<E>.forEachInRangeIndexed(range: LongRange, action: (index: Long, E) -> Unit) {
     if(range.first < 0 || range.last >= this.size) throw NoSuchElementException()
     //Calculates the indices of the first and last elements in the range
     val outerIndexOfFirst = BigArrays.segment(range.first)
@@ -429,20 +429,20 @@ inline fun <E> SafeArray64<E>.forEachInRangeIndexed(range: LongRange, action: (i
 }
 
 /** Creates a [Sequence] instance that wraps the original array returning its elements when being iterated. */
-fun SafeByteArray64.asSequence(): Sequence<Byte> = Sequence { this.iterator() }
+fun FastByteArray64.asSequence(): Sequence<Byte> = Sequence { this.iterator() }
 
 /** Returns true if all elements match the given [predicate]. */
-inline fun SafeByteArray64.all(predicate: (Byte) -> Boolean): Boolean {
+inline fun FastByteArray64.all(predicate: (Byte) -> Boolean): Boolean {
     this.forEach { e -> if(!predicate(e)) return false }
     return true
 }
 /** Returns true if at least one element matches the given [predicate]. */
-inline fun SafeByteArray64.any(predicate: (Byte) -> Boolean): Boolean {
+inline fun FastByteArray64.any(predicate: (Byte) -> Boolean): Boolean {
     this.forEach { e -> if(predicate(e)) return true }
     return false
 }
 /** Returns true if no elements match the given [predicate]. */
-inline fun SafeByteArray64.none(predicate: (Byte) -> Boolean): Boolean {
+inline fun FastByteArray64.none(predicate: (Byte) -> Boolean): Boolean {
     this.forEach { e -> if(predicate(e)) return false }
     return true
 }

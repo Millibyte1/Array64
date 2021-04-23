@@ -3,7 +3,7 @@ package com.millibyte1.array64
 import it.unimi.dsi.fastutil.BigArrays
 
 /**
- * A 64-bit-indexed byte array with an interface mirroring that of the standard library class [ShortArray].
+ * A 64-bit-indexed byte array with an interface mirroring that of the standard library class [CharArray].
  *
  * Internally uses a 2D array and the FastUtil [BigArrays] library.
  *
@@ -11,13 +11,13 @@ import it.unimi.dsi.fastutil.BigArrays
  * @property array the 2D array used internally. This should not be used except by extension functions.
  *
  */
-class SafeShortArray64 : ShortArray64 {
+class FastCharArray64 : CharArray64 {
 
     override val size: Long
-    @PublishedApi internal val array: Array<ShortArray>
+    @PublishedApi internal val array: Array<CharArray>
 
     /** Creates a new array of the specified [size], with all elements initialized according to the given [init] function */
-    constructor(size: Long, init: (Long) -> Short) {
+    constructor(size: Long, init: (Long) -> Char) {
         if(size > MAX_SIZE || size <= 0) throw IllegalArgumentException("Invalid size provided.")
         this.size = size
         //calculates the number of complete inner arrays and the size of the incomplete last inner array
@@ -25,8 +25,8 @@ class SafeShortArray64 : ShortArray64 {
         val innerSize = (size % BigArrays.SEGMENT_SIZE).toInt()
         //allocates the array
         array =
-            if(innerSize == 0) Array(fullArrays) { ShortArray(BigArrays.SEGMENT_SIZE) }
-            else Array(fullArrays + 1) { i -> if(i == fullArrays) ShortArray(innerSize) else ShortArray(BigArrays.SEGMENT_SIZE) }
+            if(innerSize == 0) Array(fullArrays) { CharArray(BigArrays.SEGMENT_SIZE) }
+            else Array(fullArrays + 1) { i -> if(i == fullArrays) CharArray(innerSize) else CharArray(BigArrays.SEGMENT_SIZE) }
         //initializes the elements of the array using cache-aware iteration as per FastUtil specification
         var index = 0L
         for(inner in array) {
@@ -37,36 +37,36 @@ class SafeShortArray64 : ShortArray64 {
         }
     }
     /** Creates a new array of the specified [size], with all elements initialized to zero. */
-    constructor(size: Long) : this(size, { 0 })
+    constructor(size: Long) : this(size, { '\u0000' })
     /** Creates a copy of the given FastUtil BigArray */
-    constructor(array: Array<ShortArray>) {
+    constructor(array: Array<CharArray>) {
         this.size = BigArrays.length(array)
         this.array = BigArrays.copy(array)
     }
     /** Creates a copy of the given Array64 */
-    constructor(array: SafeShortArray64) : this(array.array)
+    constructor(array: FastCharArray64) : this(array.array)
     /** Creates a new array from the given standard library array */
-    constructor(array: ShortArray) {
+    constructor(array: CharArray) {
         this.size = array.size.toLong()
         this.array = BigArrays.wrap(array)
     }
 
-    override fun copy(): SafeShortArray64 = SafeShortArray64(this)
+    override fun copy(): FastCharArray64 = FastCharArray64(this)
 
     /** Returns the array at the given [index]. This method can be called using the index operator. */
-    override operator fun get(index: Long): Short {
+    override operator fun get(index: Long): Char {
         if(index >= this.size || index < 0) throw NoSuchElementException()
         return BigArrays.get(array, index)
     }
     /** Sets the element at the given [index] to the given [value]. This method can be called using the index operator. */
-    override operator fun set(index: Long, value: Short) {
+    override operator fun set(index: Long, value: Char) {
         if(index >= this.size || index < 0) throw NoSuchElementException()
         BigArrays.set(array, index, value)
     }
 
     /** Creates an iterator over the elements of the array. */
-    override operator fun iterator(): ShortIterator = ShortArray64Iterator(this, 0)
-    override fun iterator(index: Long): ShortIterator {
+    override operator fun iterator(): CharIterator = CharArray64Iterator(this, 0)
+    override fun iterator(index: Long): CharIterator {
         TODO("Not yet implemented")
     }
 
@@ -75,8 +75,8 @@ class SafeShortArray64 : ShortArray64 {
     }
 }
 
-/** Simple forward iterator implementation for a ShortArray64 */
-private class ShortArray64Iterator(val array: SafeShortArray64, var index: Long) : ShortIterator() {
+/** Simple forward iterator implementation for a CharArray64 */
+private class CharArray64Iterator(val array: FastCharArray64, var index: Long) : CharIterator() {
     override fun hasNext(): Boolean = index < array.size
-    override fun nextShort(): Short = if(index < array.size) array[++index] else throw NoSuchElementException()
+    override fun nextChar(): Char = if(index < array.size) array[++index] else throw NoSuchElementException()
 }

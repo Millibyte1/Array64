@@ -42,8 +42,15 @@ class FastArray64<E> : Array64<E> {
         BigArrays.set(array, index, value)
     }
 
-    override operator fun iterator(): FastArray64Iterator<E> = FastArray64Iterator(this, 0)
-    override fun iterator(index: Long): FastArray64Iterator<E> = FastArray64Iterator(this, index)
+    /**
+     * Returns an iterator to the element at the given [index].
+     * @throws IllegalArgumentException if an invalid index is provided
+     */
+    override fun iterator(index: Long): LongIndexedBidirectionalIterator<E> {
+        if(index < 0 || index >= this.size) throw IllegalArgumentException("Invalid index provided.")
+        return FastArray64Iterator(this, index)
+    }
+    override operator fun iterator(): LongIndexedBidirectionalIterator<E> = FastArray64Iterator(this, 0)
 
     companion object {
         /**
@@ -59,13 +66,14 @@ class FastArray64<E> : Array64<E> {
 }
 
 /**
- * A simple efficient forward iterator for the FastArray64 class.
+ * A simple efficient bidirectional iterator for the FastArray64 class.
  * @param E the type of element stored in the array
  * @constructor Constructs an iterator to the given [index] in the given [array].
  * @param array the array to iterate over
  * @param index the index to start at
  */
-class FastArray64Iterator<E>(private val array: FastArray64<E>, index: Long) : LongIndexedIterator<E> {
+private class FastArray64Iterator<E>(private val array: FastArray64<E>, index: Long) : LongIndexedBidirectionalIterator<E> {
+
     override var index: Long = index
         private set
     private var outerIndex = BigArrays.segment(index)
@@ -73,13 +81,19 @@ class FastArray64Iterator<E>(private val array: FastArray64<E>, index: Long) : L
     private var inner = array.array[outerIndex]
 
     override fun hasNext(): Boolean = index < array.size
+    override fun hasPrevious(): Boolean = index >= 0
     override fun next(): E {
         val retval = inner[innerIndex]
-        updateIndices()
+        increaseIndices()
         return retval
     }
-    //updates the current index and the cached inner array
-    private fun updateIndices() {
+    override fun previous(): E {
+        val retval = inner[innerIndex]
+        decreaseIndices()
+        return retval
+    }
+    //increases the current index and the cached inner array
+    private fun increaseIndices() {
         if(innerIndex == BigArrays.SEGMENT_SIZE - 1) {
             innerIndex = 0
             outerIndex++
@@ -87,5 +101,15 @@ class FastArray64Iterator<E>(private val array: FastArray64<E>, index: Long) : L
         }
         else innerIndex++
         index++
+    }
+    //decreases the current index and the cached inner array
+    private fun decreaseIndices() {
+        if(innerIndex == 0) {
+            innerIndex = BigArrays.SEGMENT_SIZE - 1
+            outerIndex--
+            inner = array.array[outerIndex]
+        }
+        else innerIndex--
+        index--
     }
 }

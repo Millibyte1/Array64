@@ -64,8 +64,15 @@ class FastDoubleArray64 : DoubleArray64 {
         BigArrays.set(array, index, value)
     }
 
-    override operator fun iterator(): LongIndexedDoubleIterator = FastDoubleArray64Iterator(this, 0)
-    override fun iterator(index: Long): LongIndexedDoubleIterator = FastDoubleArray64Iterator(this, index)
+    /**
+     * Returns an iterator to the element at the given [index].
+     * @throws IllegalArgumentException if an invalid index is provided
+     */
+    override fun iterator(index: Long): LongIndexedBidirectionalDoubleIterator {
+        if(index < 0 || index >= this.size) throw IllegalArgumentException("Invalid index provided.")
+        return FastDoubleArray64Iterator(this, index)
+    }
+    override operator fun iterator(): LongIndexedBidirectionalDoubleIterator = FastDoubleArray64Iterator(this, 0)
 
     companion object {
         const val MAX_SIZE = BigArrays.SEGMENT_SIZE.toLong() * Int.MAX_VALUE
@@ -73,12 +80,12 @@ class FastDoubleArray64 : DoubleArray64 {
 }
 
 /**
- * A simple efficient forward iterator for the FastArray64 class.
+ * A simple efficient bidirectional iterator for the FastDoubleArray64 class.
  * @constructor Constructs an iterator to the given [index] in the given [array].
  * @param array the array to iterate over
  * @param index the index to start at
  */
-class FastDoubleArray64Iterator(private val array: FastDoubleArray64, index: Long) : LongIndexedDoubleIterator() {
+private class FastDoubleArray64Iterator(private val array: FastDoubleArray64, index: Long) : LongIndexedBidirectionalDoubleIterator() {
     override var index: Long = index
         private set
     private var outerIndex = BigArrays.segment(index)
@@ -86,13 +93,19 @@ class FastDoubleArray64Iterator(private val array: FastDoubleArray64, index: Lon
     private var inner = array.array[outerIndex]
 
     override fun hasNext(): Boolean = index < array.size
+    override fun hasPrevious(): Boolean = index > 0
     override fun nextDouble(): Double {
         val retval = inner[innerIndex]
-        updateIndices()
+        increaseIndices()
         return retval
     }
-    //updates the current index and the cached inner array
-    private fun updateIndices() {
+    override fun previousDouble(): Double {
+        val retval = inner[innerIndex]
+        decreaseIndices()
+        return retval
+    }
+    //increases the current index and the cached inner array
+    private fun increaseIndices() {
         if(innerIndex == BigArrays.SEGMENT_SIZE - 1) {
             innerIndex = 0
             outerIndex++
@@ -100,5 +113,15 @@ class FastDoubleArray64Iterator(private val array: FastDoubleArray64, index: Lon
         }
         else innerIndex++
         index++
+    }
+    //decreases the current index and the cached inner array
+    private fun decreaseIndices() {
+        if(innerIndex == 0) {
+            innerIndex = BigArrays.SEGMENT_SIZE - 1
+            outerIndex--
+            inner = array.array[outerIndex]
+        }
+        else innerIndex--
+        index--
     }
 }

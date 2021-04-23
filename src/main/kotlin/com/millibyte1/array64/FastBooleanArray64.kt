@@ -64,8 +64,15 @@ class FastBooleanArray64 : BooleanArray64 {
         BigArrays.set(array, index, value)
     }
 
-    override operator fun iterator(): LongIndexedBooleanIterator = FastBooleanArray64Iterator(this, 0)
-    override fun iterator(index: Long): LongIndexedBooleanIterator = FastBooleanArray64Iterator(this, index)
+    /**
+     * Returns an iterator to the element at the given [index].
+     * @throws IllegalArgumentException if an invalid index is provided
+     */
+    override fun iterator(index: Long): LongIndexedBidirectionalBooleanIterator {
+        if(index < 0 || index >= this.size) throw IllegalArgumentException("Invalid index provided.")
+        return FastBooleanArray64Iterator(this, index)
+    }
+    override operator fun iterator(): LongIndexedBidirectionalBooleanIterator = FastBooleanArray64Iterator(this, 0)
 
     companion object {
         const val MAX_SIZE = BigArrays.SEGMENT_SIZE.toLong() * Int.MAX_VALUE
@@ -73,12 +80,12 @@ class FastBooleanArray64 : BooleanArray64 {
 }
 
 /**
- * A simple efficient forward iterator for the FastArray64 class.
+ * A simple efficient bidirectional iterator for the FastBooleanArray64 class.
  * @constructor Constructs an iterator to the given [index] in the given [array].
  * @param array the array to iterate over
  * @param index the index to start at
  */
-class FastBooleanArray64Iterator(private val array: FastBooleanArray64, index: Long) : LongIndexedBooleanIterator() {
+private class FastBooleanArray64Iterator(private val array: FastBooleanArray64, index: Long) : LongIndexedBidirectionalBooleanIterator() {
     override var index: Long = index
         private set
     private var outerIndex = BigArrays.segment(index)
@@ -86,13 +93,19 @@ class FastBooleanArray64Iterator(private val array: FastBooleanArray64, index: L
     private var inner = array.array[outerIndex]
 
     override fun hasNext(): Boolean = index < array.size
+    override fun hasPrevious(): Boolean = index > 0
     override fun nextBoolean(): Boolean {
         val retval = inner[innerIndex]
-        updateIndices()
+        increaseIndices()
         return retval
     }
-    //updates the current index and the cached inner array
-    private fun updateIndices() {
+    override fun previousBoolean(): Boolean {
+        val retval = inner[innerIndex]
+        decreaseIndices()
+        return retval
+    }
+    //increases the current index and the cached inner array
+    private fun increaseIndices() {
         if(innerIndex == BigArrays.SEGMENT_SIZE - 1) {
             innerIndex = 0
             outerIndex++
@@ -100,5 +113,15 @@ class FastBooleanArray64Iterator(private val array: FastBooleanArray64, index: L
         }
         else innerIndex++
         index++
+    }
+    //decreases the current index and the cached inner array
+    private fun decreaseIndices() {
+        if(innerIndex == 0) {
+            innerIndex = BigArrays.SEGMENT_SIZE - 1
+            outerIndex--
+            inner = array.array[outerIndex]
+        }
+        else innerIndex--
+        index--
     }
 }

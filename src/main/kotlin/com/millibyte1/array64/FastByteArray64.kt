@@ -64,8 +64,15 @@ class FastByteArray64 : ByteArray64 {
         BigArrays.set(array, index, value)
     }
 
-    override operator fun iterator(): LongIndexedByteIterator = FastByteArray64Iterator(this, 0)
-    override fun iterator(index: Long): LongIndexedByteIterator = FastByteArray64Iterator(this, index)
+    /**
+     * Returns an iterator to the element at the given [index].
+     * @throws IllegalArgumentException if an invalid index is provided
+     */
+    override fun iterator(index: Long): LongIndexedBidirectionalByteIterator {
+        if(index < 0 || index >= this.size) throw IllegalArgumentException("Invalid index provided.")
+        return FastByteArray64Iterator(this, index)
+    }
+    override operator fun iterator(): LongIndexedBidirectionalByteIterator = FastByteArray64Iterator(this, 0)
 
     companion object {
         const val MAX_SIZE = BigArrays.SEGMENT_SIZE.toLong() * Int.MAX_VALUE
@@ -73,12 +80,12 @@ class FastByteArray64 : ByteArray64 {
 }
 
 /**
- * A simple efficient forward iterator for the FastArray64 class.
+ * A simple efficient bidirectional iterator for the FastByteArray64 class.
  * @constructor Constructs an iterator to the given [index] in the given [array].
  * @param array the array to iterate over
  * @param index the index to start at
  */
-class FastByteArray64Iterator(private val array: FastByteArray64, index: Long) : LongIndexedByteIterator() {
+private class FastByteArray64Iterator(private val array: FastByteArray64, index: Long) : LongIndexedBidirectionalByteIterator() {
     override var index: Long = index
         private set
     private var outerIndex = BigArrays.segment(index)
@@ -86,19 +93,37 @@ class FastByteArray64Iterator(private val array: FastByteArray64, index: Long) :
     private var inner = array.array[outerIndex]
 
     override fun hasNext(): Boolean = index < array.size
+    override fun hasPrevious(): Boolean = index > 0
     override fun nextByte(): Byte {
+        if(!hasNext()) throw NoSuchElementException()
         val retval = inner[innerIndex]
-        updateIndices()
+        increaseIndices()
         return retval
     }
-    //updates the current index and the cached inner array
-    private fun updateIndices() {
+    override fun previousByte(): Byte {
+        if(!hasPrevious()) throw NoSuchElementException()
+        val retval = inner[innerIndex]
+        decreaseIndices()
+        return retval
+    }
+    //increases the current index and the cached inner array
+    private fun increaseIndices() {
         if(innerIndex == BigArrays.SEGMENT_SIZE - 1) {
             innerIndex = 0
             outerIndex++
-            inner = array.array[outerIndex]
+            if(index != array.lastIndex) inner = array.array[outerIndex]
         }
         else innerIndex++
         index++
+    }
+    //decreases the current index and the cached inner array
+    private fun decreaseIndices() {
+        if(innerIndex == 0) {
+            innerIndex = BigArrays.SEGMENT_SIZE - 1
+            outerIndex--
+            if(index != 0L) inner = array.array[outerIndex]
+        }
+        else innerIndex--
+        index--
     }
 }

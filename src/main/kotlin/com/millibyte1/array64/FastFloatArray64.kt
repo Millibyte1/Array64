@@ -11,7 +11,7 @@ import it.unimi.dsi.fastutil.BigArrays
  * @property array the 2D array used internally. This should not be used except by extension functions.
  *
  */
-class SafeFloatArray64 : FloatArray64 {
+class FastFloatArray64 : FloatArray64 {
 
     override val size: Long
     @PublishedApi internal val array: Array<FloatArray>
@@ -44,14 +44,14 @@ class SafeFloatArray64 : FloatArray64 {
         this.array = BigArrays.copy(array)
     }
     /** Creates a copy of the given Array64 */
-    constructor(array: SafeFloatArray64) : this(array.array)
+    constructor(array: FastFloatArray64) : this(array.array)
     /** Creates a new array from the given standard library array */
     constructor(array: FloatArray) {
         this.size = array.size.toLong()
         this.array = BigArrays.wrap(array)
     }
 
-    override fun copy(): SafeFloatArray64 = SafeFloatArray64(this)
+    override fun copy(): FastFloatArray64 = FastFloatArray64(this)
 
     /** Returns the array at the given [index]. This method can be called using the index operator. */
     override operator fun get(index: Long): Float {
@@ -64,19 +64,41 @@ class SafeFloatArray64 : FloatArray64 {
         BigArrays.set(array, index, value)
     }
 
-    /** Creates an iterator over the elements of the array. */
-    override operator fun iterator(): FloatIterator = FloatArray64Iterator(this, 0)
-    override fun iterator(index: Long): FloatIterator {
-        TODO("Not yet implemented")
-    }
+    override operator fun iterator(): LongIndexedFloatIterator = FastFloatArray64Iterator(this, 0)
+    override fun iterator(index: Long): LongIndexedFloatIterator = FastFloatArray64Iterator(this, index)
 
     companion object {
         const val MAX_SIZE = BigArrays.SEGMENT_SIZE.toLong() * Int.MAX_VALUE
     }
 }
 
-/** Simple forward iterator implementation for a FloatArray64 */
-private class FloatArray64Iterator(val array: SafeFloatArray64, var index: Long) : FloatIterator() {
+/**
+ * A simple efficient forward iterator for the FastArray64 class.
+ * @constructor Constructs an iterator to the given [index] in the given [array].
+ * @param array the array to iterate over
+ * @param index the index to start at
+ */
+class FastFloatArray64Iterator(private val array: FastFloatArray64, index: Long) : LongIndexedFloatIterator() {
+    override var index: Long = index
+        private set
+    private var outerIndex = BigArrays.segment(index)
+    private var innerIndex = BigArrays.displacement(index)
+    private var inner = array.array[outerIndex]
+
     override fun hasNext(): Boolean = index < array.size
-    override fun nextFloat(): Float = if(index < array.size) array[++index] else throw NoSuchElementException()
+    override fun nextFloat(): Float {
+        val retval = inner[innerIndex]
+        updateIndices()
+        return retval
+    }
+    //updates the current index and the cached inner array
+    private fun updateIndices() {
+        if(innerIndex == BigArrays.SEGMENT_SIZE - 1) {
+            innerIndex = 0
+            outerIndex++
+            inner = array.array[outerIndex]
+        }
+        else innerIndex++
+        index++
+    }
 }

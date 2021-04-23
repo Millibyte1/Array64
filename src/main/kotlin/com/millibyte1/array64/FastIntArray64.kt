@@ -64,19 +64,41 @@ class FastIntArray64 : IntArray64 {
         BigArrays.set(array, index, value)
     }
 
-    /** Creates an iterator over the elements of the array. */
-    override operator fun iterator(): IntIterator = FastIntArray64Iterator(this, 0)
-    override fun iterator(index: Long): IntIterator {
-        TODO("Not yet implemented")
-    }
+    override operator fun iterator(): LongIndexedIntIterator = FastIntArray64Iterator(this, 0)
+    override fun iterator(index: Long): LongIndexedIntIterator = FastIntArray64Iterator(this, index)
 
     companion object {
         const val MAX_SIZE = BigArrays.SEGMENT_SIZE.toLong() * Int.MAX_VALUE
     }
 }
 
-/** Simple forward iterator implementation for a IntArray64 */
-private class FastIntArray64Iterator(val array: FastIntArray64, var index: Long) : IntIterator() {
+/**
+ * A simple efficient forward iterator for the FastArray64 class.
+ * @constructor Constructs an iterator to the given [index] in the given [array].
+ * @param array the array to iterate over
+ * @param index the index to start at
+ */
+class FastIntArray64Iterator(private val array: FastIntArray64, index: Long) : LongIndexedIntIterator() {
+    override var index: Long = index
+        private set
+    private var outerIndex = BigArrays.segment(index)
+    private var innerIndex = BigArrays.displacement(index)
+    private var inner = array.array[outerIndex]
+
     override fun hasNext(): Boolean = index < array.size
-    override fun nextInt(): Int = if(index < array.size) array[++index] else throw NoSuchElementException()
+    override fun nextInt(): Int {
+        val retval = inner[innerIndex]
+        updateIndices()
+        return retval
+    }
+    //updates the current index and the cached inner array
+    private fun updateIndices() {
+        if(innerIndex == BigArrays.SEGMENT_SIZE - 1) {
+            innerIndex = 0
+            outerIndex++
+            inner = array.array[outerIndex]
+        }
+        else innerIndex++
+        index++
+    }
 }

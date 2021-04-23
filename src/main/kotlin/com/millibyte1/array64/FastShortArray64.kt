@@ -64,19 +64,41 @@ class FastShortArray64 : ShortArray64 {
         BigArrays.set(array, index, value)
     }
 
-    /** Creates an iterator over the elements of the array. */
-    override operator fun iterator(): ShortIterator = ShortArray64Iterator(this, 0)
-    override fun iterator(index: Long): ShortIterator {
-        TODO("Not yet implemented")
-    }
+    override operator fun iterator(): LongIndexedShortIterator = FastShortArray64Iterator(this, 0)
+    override fun iterator(index: Long): LongIndexedShortIterator = FastShortArray64Iterator(this, index)
 
     companion object {
         const val MAX_SIZE = BigArrays.SEGMENT_SIZE.toLong() * Int.MAX_VALUE
     }
 }
 
-/** Simple forward iterator implementation for a ShortArray64 */
-private class ShortArray64Iterator(val array: FastShortArray64, var index: Long) : ShortIterator() {
+/**
+ * A simple efficient forward iterator for the FastArray64 class.
+ * @constructor Constructs an iterator to the given [index] in the given [array].
+ * @param array the array to iterate over
+ * @param index the index to start at
+ */
+class FastShortArray64Iterator(private val array: FastShortArray64, index: Long) : LongIndexedShortIterator() {
+    override var index: Long = index
+        private set
+    private var outerIndex = BigArrays.segment(index)
+    private var innerIndex = BigArrays.displacement(index)
+    private var inner = array.array[outerIndex]
+
     override fun hasNext(): Boolean = index < array.size
-    override fun nextShort(): Short = if(index < array.size) array[++index] else throw NoSuchElementException()
+    override fun nextShort(): Short {
+        val retval = inner[innerIndex]
+        updateIndices()
+        return retval
+    }
+    //updates the current index and the cached inner array
+    private fun updateIndices() {
+        if(innerIndex == BigArrays.SEGMENT_SIZE - 1) {
+            innerIndex = 0
+            outerIndex++
+            inner = array.array[outerIndex]
+        }
+        else innerIndex++
+        index++
+    }
 }

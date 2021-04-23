@@ -42,12 +42,8 @@ class FastArray64<E> : Array64<E> {
         BigArrays.set(array, index, value)
     }
 
-    override operator fun iterator(): Iterator<E> {
-        TODO("Not yet implemented")
-    }
-    override fun iterator(index: Long): Iterator<E> {
-        TODO("Not yet implemented")
-    }
+    override operator fun iterator(): FastArray64Iterator<E> = FastArray64Iterator(this, 0)
+    override fun iterator(index: Long): FastArray64Iterator<E> = FastArray64Iterator(this, index)
 
     companion object {
         /**
@@ -63,17 +59,33 @@ class FastArray64<E> : Array64<E> {
 }
 
 /**
- * A simple efficient iterator for the FastArray64 class.
- * Does not require a
+ * A simple efficient forward iterator for the FastArray64 class.
+ * @param E the type of element stored in the array
+ * @constructor Constructs an iterator to the given [index] in the given [array].
+ * @param array the array to iterate over
+ * @param index the index to start at
  */
-private class FastArray64Iterator<E>(private val array: FastArray64<E>, private var index: Long) : Iterator<E> {
+class FastArray64Iterator<E>(private val array: FastArray64<E>, index: Long) : LongIndexedIterator<E> {
+    override var index: Long = index
+        private set
     private var outerIndex = BigArrays.segment(index)
     private var innerIndex = BigArrays.displacement(index)
-    override fun hasNext(): Boolean {
-        TODO("Not yet implemented")
-    }
-    override fun next(): E {
-        TODO("Not yet implemented")
-    }
+    private var inner = array.array[outerIndex]
 
+    override fun hasNext(): Boolean = index < array.size
+    override fun next(): E {
+        val retval = inner[innerIndex]
+        updateIndices()
+        return retval
+    }
+    //updates the current index and the cached inner array
+    private fun updateIndices() {
+        if(innerIndex == BigArrays.SEGMENT_SIZE - 1) {
+            innerIndex = 0
+            outerIndex++
+            inner = array.array[outerIndex]
+        }
+        else innerIndex++
+        index++
+    }
 }

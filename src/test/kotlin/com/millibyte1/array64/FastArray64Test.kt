@@ -27,7 +27,7 @@ class FastArray64Test {
     @Test
     @Order(2)
     fun testSet() {
-        val array = FastArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
+        val array = FastArray64(TEST_SMALL_ARRAY_SIZE) { i -> (i % 8).toByte() }
         array.forEachIndexed {
             i, e -> run {
                 array[i] = (e - 1).toByte()

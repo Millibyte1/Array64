@@ -9,6 +9,7 @@ import it.unimi.dsi.fastutil.BigArrays
  *
  * @property size the number of elements in this array
  * @property array the 2D array used internally. This should not be used except by extension functions.
+ *
  */
 class FastBooleanArray64 : BooleanArray64 {
 
@@ -63,19 +64,41 @@ class FastBooleanArray64 : BooleanArray64 {
         BigArrays.set(array, index, value)
     }
 
-    /** Creates an iterator over the elements of the array. */
-    override operator fun iterator(): BooleanIterator = BooleanArray64Iterator(this, 0)
-    override fun iterator(index: Long): BooleanIterator {
-        TODO("Not yet implemented")
-    }
+    override operator fun iterator(): LongIndexedBooleanIterator = FastBooleanArray64Iterator(this, 0)
+    override fun iterator(index: Long): LongIndexedBooleanIterator = FastBooleanArray64Iterator(this, index)
 
     companion object {
         const val MAX_SIZE = BigArrays.SEGMENT_SIZE.toLong() * Int.MAX_VALUE
     }
 }
 
-/** Simple forward iterator implementation for a BooleanArray64 */
-private class BooleanArray64Iterator(val array: FastBooleanArray64, var index: Long) : BooleanIterator() {
+/**
+ * A simple efficient forward iterator for the FastArray64 class.
+ * @constructor Constructs an iterator to the given [index] in the given [array].
+ * @param array the array to iterate over
+ * @param index the index to start at
+ */
+class FastBooleanArray64Iterator(private val array: FastBooleanArray64, index: Long) : LongIndexedBooleanIterator() {
+    override var index: Long = index
+        private set
+    private var outerIndex = BigArrays.segment(index)
+    private var innerIndex = BigArrays.displacement(index)
+    private var inner = array.array[outerIndex]
+
     override fun hasNext(): Boolean = index < array.size
-    override fun nextBoolean(): Boolean = if(index < array.size) array[++index] else throw NoSuchElementException()
+    override fun nextBoolean(): Boolean {
+        val retval = inner[innerIndex]
+        updateIndices()
+        return retval
+    }
+    //updates the current index and the cached inner array
+    private fun updateIndices() {
+        if(innerIndex == BigArrays.SEGMENT_SIZE - 1) {
+            innerIndex = 0
+            outerIndex++
+            inner = array.array[outerIndex]
+        }
+        else innerIndex++
+        index++
+    }
 }

@@ -105,7 +105,7 @@ class FastByteArray64Test {
     }
 
     companion object {
-        const val TEST_SMALL_ARRAY_SIZE = BigArrays.SEGMENT_SIZE.toLong()
+        const val TEST_SMALL_ARRAY_SIZE = BigArrays.SEGMENT_SIZE.toLong() + 1
         const val TEST_MEDIUM_ARRAY_SIZE = BigArrays.SEGMENT_SIZE.toLong() * 2
         const val TEST_LARGE_ARRAY_SIZE = Int.MAX_VALUE.toLong() - 8
     }

@@ -51,109 +51,123 @@ infix fun <E> Array64<E>.contentEquals(other: Array64<E>): Boolean {
 }
 /** Performs the given [action] on each element. */
 inline fun <E> Array64<E>.forEach(action: (E) -> Unit) {
-    for(element in this) action(element)
+    val iterator = this.iterator()
+    while(iterator.hasNext()) action(iterator.next())
 }
 /** Performs the given [action] on each element. */
 inline fun ByteArray64.forEach(action: (Byte) -> Unit) {
-    for(element in this) action(element)
+    val iterator = this.iterator()
+    while(iterator.hasNext()) action(iterator.next())
 }
 /** Performs the given [action] on each element. */
 inline fun BooleanArray64.forEach(action: (Boolean) -> Unit) {
-    for(element in this) action(element)
+    val iterator = this.iterator()
+    while(iterator.hasNext()) action(iterator.next())
 }
 /** Performs the given [action] on each element. */
 inline fun CharArray64.forEach(action: (Char) -> Unit) {
-    for(element in this) action(element)
+    val iterator = this.iterator()
+    while(iterator.hasNext()) action(iterator.next())
 }
 /** Performs the given [action] on each element. */
 inline fun ShortArray64.forEach(action: (Short) -> Unit) {
-    for(element in this) action(element)
+    val iterator = this.iterator()
+    while(iterator.hasNext()) action(iterator.next())
 }
 /** Performs the given [action] on each element. */
 inline fun IntArray64.forEach(action: (Int) -> Unit) {
-    for(element in this) action(element)
+    val iterator = this.iterator()
+    while(iterator.hasNext()) action(iterator.next())
 }
 /** Performs the given [action] on each element. */
 inline fun LongArray64.forEach(action: (Long) -> Unit) {
-    for(element in this) action(element)
+    val iterator = this.iterator()
+    while(iterator.hasNext()) action(iterator.next())
 }
 /** Performs the given [action] on each element. */
 inline fun FloatArray64.forEach(action: (Float) -> Unit) {
-    for(element in this) action(element)
+    val iterator = this.iterator()
+    while(iterator.hasNext()) action(iterator.next())
 }
 /** Performs the given [action] on each element. */
 inline fun DoubleArray64.forEach(action: (Double) -> Unit) {
-    for(element in this) action(element)
+    val iterator = this.iterator()
+    while(iterator.hasNext()) action(iterator.next())
 }
 /** Performs the given [action] on each element, providing sequential index with the element. */
-inline fun <E> Array64<E>.forEachIndexed(action: (index: Long, E) -> Unit) {
-    var index = 0L
-    for(element in this) {
-        action(index, element)
-        index++
-    }
+inline fun <E> FastArray64<E>.forEachIndexed(action: (index: Long, E) -> Unit) {
+    val iterator = this.iterator()
+    while(iterator.hasNext()) action(iterator.index, iterator.next())
 }
 /** Performs the given [action] on each element, providing sequential index with the element. */
 inline fun ByteArray64.forEachIndexed(action: (index: Long, Byte) -> Unit) {
     var index = 0L
-    for(element in this) {
-        action(index, element)
+    val iterator = this.iterator()
+    while(iterator.hasNext()) {
+        action(index, iterator.next())
         index++
     }
 }
 /** Performs the given [action] on each element, providing sequential index with the element. */
 inline fun BooleanArray64.forEachIndexed(action: (index: Long, Boolean) -> Unit) {
     var index = 0L
-    for(element in this) {
-        action(index, element)
+    val iterator = this.iterator()
+    while(iterator.hasNext()) {
+        action(index, iterator.next())
         index++
     }
 }
 /** Performs the given [action] on each element, providing sequential index with the element. */
 inline fun CharArray64.forEachIndexed(action: (index: Long, Char) -> Unit) {
     var index = 0L
-    for(element in this) {
-        action(index, element)
+    val iterator = this.iterator()
+    while(iterator.hasNext()) {
+        action(index, iterator.next())
         index++
     }
 }
 /** Performs the given [action] on each element, providing sequential index with the element. */
 inline fun ShortArray64.forEachIndexed(action: (index: Long, Short) -> Unit) {
     var index = 0L
-    for(element in this) {
-        action(index, element)
+    val iterator = this.iterator()
+    while(iterator.hasNext()) {
+        action(index, iterator.next())
         index++
     }
 }
 /** Performs the given [action] on each element, providing sequential index with the element. */
 inline fun IntArray64.forEachIndexed(action: (index: Long, Int) -> Unit) {
     var index = 0L
-    for(element in this) {
-        action(index, element)
+    val iterator = this.iterator()
+    while(iterator.hasNext()) {
+        action(index, iterator.next())
         index++
     }
 }
 /** Performs the given [action] on each element, providing sequential index with the element. */
 inline fun LongArray64.forEachIndexed(action: (index: Long, Long) -> Unit) {
     var index = 0L
-    for(element in this) {
-        action(index, element)
+    val iterator = this.iterator()
+    while(iterator.hasNext()) {
+        action(index, iterator.next())
         index++
     }
 }
 /** Performs the given [action] on each element, providing sequential index with the element. */
 inline fun FloatArray64.forEachIndexed(action: (index: Long, Float) -> Unit) {
     var index = 0L
-    for(element in this) {
-        action(index, element)
+    val iterator = this.iterator()
+    while(iterator.hasNext()) {
+        action(index, iterator.next())
         index++
     }
 }
 /** Performs the given [action] on each element, providing sequential index with the element. */
 inline fun DoubleArray64.forEachIndexed(action: (index: Long, Double) -> Unit) {
     var index = 0L
-    for(element in this) {
-        action(index, element)
+    val iterator = this.iterator()
+    while(iterator.hasNext()) {
+        action(index, iterator.next())
         index++
     }
 }
@@ -317,114 +331,6 @@ inline fun DoubleArray64.forEachInRangeIndexed(range: LongRange, action: (index:
     for(element in this.iterator(range.first)) {
         action(index, element)
         index++
-    }
-}
-
-// TODO: Old stuff
-/** Returns the last valid index for the array. */
-val FastByteArray64.lastIndex: Long
-    get() = size - 1
-/** Returns the range of valid indices for the array. */
-val FastByteArray64.indices: LongRange
-    get() = LongRange(0, lastIndex)
-/** Returns the last valid index for the array. */
-val FastShortArray64.lastIndex: Long
-    get() = size - 1
-/** Returns the range of valid indices for the array. */
-val FastShortArray64.indices: LongRange
-    get() = LongRange(0, lastIndex)
-/** Returns the last valid index for the array. */
-val FastIntArray64.lastIndex: Long
-    get() = size - 1
-/** Returns the range of valid indices for the array. */
-val FastIntArray64.indices: LongRange
-    get() = LongRange(0, lastIndex)
-/** Returns the last valid index for the array. */
-val FastLongArray64.lastIndex: Long
-    get() = size - 1
-/** Returns the range of valid indices for the array. */
-val FastLongArray64.indices: LongRange
-    get() = LongRange(0, lastIndex)
-/** Returns the last valid index for the array. */
-val SafeFloatArray64.lastIndex: Long
-    get() = size - 1
-/** Returns the range of valid indices for the array. */
-val SafeFloatArray64.indices: LongRange
-    get() = LongRange(0, lastIndex)
-/** Returns the last valid index for the array. */
-val SafeDoubleArray64.lastIndex: Long
-    get() = size - 1
-/** Returns the range of valid indices for the array. */
-val SafeDoubleArray64.indices: LongRange
-    get() = LongRange(0, lastIndex)
-/** Returns the last valid index for the array. */
-val FastBooleanArray64.lastIndex: Long
-    get() = size - 1
-/** Returns the range of valid indices for the array. */
-val FastBooleanArray64.indices: LongRange
-    get() = LongRange(0, lastIndex)
-/** Returns the last valid index for the array. */
-val FastCharArray64.lastIndex: Long
-    get() = size - 1
-/** Returns the range of valid indices for the array. */
-val FastCharArray64.indices: LongRange
-    get() = LongRange(0, lastIndex)
-/** Performs the given [action] on each element. */
-inline fun <E> FastArray64<E>.forEach(action: (E) -> Unit) {
-    //applies the action to each element using a cache-aware iteration
-    for(inner in array) {
-        for(element in inner) {
-            action(element)
-        }
-    }
-}
-/** Performs the given [action] on each element, providing sequential index with the element. */
-inline fun <E> FastArray64<E>.forEachIndexed(action: (index: Long, E) -> Unit) {
-    //applies the action to each element using a cache-aware iteration
-    var index = 0L
-    for(inner in array) {
-        for(element in inner) {
-            action(index, element)
-            index++
-        }
-    }
-}
-/** Performs the given [action] on each element within the [range]. */
-inline fun <E> FastArray64<E>.forEachInRange(range: LongRange, action: (E) -> Unit) {
-    if(range.first < 0 || range.last >= this.size) throw NoSuchElementException()
-    //Calculates the indices of the first and last elements in the range
-    val outerIndexOfFirst = BigArrays.segment(range.first)
-    val outerIndexOfLast = BigArrays.segment(range.last)
-    val innerIndexOfFirst = (range.first - (BigArrays.SEGMENT_SIZE * outerIndexOfFirst)).toInt()
-    val innerIndexOfLast = (range.last - (BigArrays.SEGMENT_SIZE * outerIndexOfLast)).toInt()
-    //Performs the iteration
-    for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
-        val inner = array[outerIndex]
-        val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
-        for(innerIndex in startingInnerIndex..endingInnerIndex) {
-            action(inner[innerIndex])
-        }
-    }
-}
-/** Performs the given [action] on each element within the [range], providing sequential index with the element. */
-inline fun <E> FastArray64<E>.forEachInRangeIndexed(range: LongRange, action: (index: Long, E) -> Unit) {
-    if(range.first < 0 || range.last >= this.size) throw NoSuchElementException()
-    //Calculates the indices of the first and last elements in the range
-    val outerIndexOfFirst = BigArrays.segment(range.first)
-    val outerIndexOfLast = BigArrays.segment(range.last)
-    val innerIndexOfFirst = (range.first - (BigArrays.SEGMENT_SIZE * outerIndexOfFirst)).toInt()
-    val innerIndexOfLast = (range.last - (BigArrays.SEGMENT_SIZE * outerIndexOfLast)).toInt()
-    //Performs the iteration
-    var index = range.first
-    for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
-        val inner = array[outerIndex]
-        val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
-        for(innerIndex in startingInnerIndex..endingInnerIndex) {
-            action(index, inner[innerIndex])
-            index++
-        }
     }
 }
 

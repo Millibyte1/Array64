@@ -45,6 +45,12 @@ class FastByteArray64Test {
         array[TEST_SMALL_ARRAY_SIZE + 3] = 1
         array[TEST_SMALL_ARRAY_SIZE + 4] = 1
         var count = 0
+        /*
+        val iterator = array.iterator(1)
+        while(iterator.index < TEST_SMALL_ARRAY_SIZE + 4) {
+            if(iterator.nextByte() == 1.toByte()) count++
+        }
+         */
         array.forEachInRangeIndexed(1 until TEST_SMALL_ARRAY_SIZE + 4) { _, e -> if(e == 1.toByte()) count++ }
         assertEquals(count, 2)
     }

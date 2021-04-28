@@ -37,7 +37,7 @@ inline fun <E> FastArray64<E>.forEachInRange(range: LongRange, action: (E) -> Un
     for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
         val inner = this.array[outerIndex]
         val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else 0
+        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
         for(innerIndex in startingInnerIndex..endingInnerIndex) {
             action(inner[innerIndex])
         }
@@ -56,7 +56,7 @@ inline fun <E> FastArray64<E>.forEachInRangeIndexed(range: LongRange, action: (i
     for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
         val inner = this.array[outerIndex]
         val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else 0
+        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
         for(innerIndex in startingInnerIndex..endingInnerIndex) {
             action(index, inner[innerIndex])
             index++
@@ -93,7 +93,7 @@ inline fun FastByteArray64.forEachInRange(range: LongRange, action: (Byte) -> Un
     for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
         val inner = this.array[outerIndex]
         val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else 0
+        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
         for(innerIndex in startingInnerIndex..endingInnerIndex) {
             action(inner[innerIndex])
         }
@@ -112,7 +112,7 @@ inline fun FastByteArray64.forEachInRangeIndexed(range: LongRange, action: (inde
     for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
         val inner = this.array[outerIndex]
         val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else 0
+        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
         for(innerIndex in startingInnerIndex..endingInnerIndex) {
             action(index, inner[innerIndex])
             index++
@@ -149,7 +149,7 @@ inline fun FastBooleanArray64.forEachInRange(range: LongRange, action: (Boolean)
     for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
         val inner = this.array[outerIndex]
         val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else 0
+        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
         for(innerIndex in startingInnerIndex..endingInnerIndex) {
             action(inner[innerIndex])
         }
@@ -168,7 +168,7 @@ inline fun FastBooleanArray64.forEachInRangeIndexed(range: LongRange, action: (i
     for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
         val inner = this.array[outerIndex]
         val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else 0
+        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
         for(innerIndex in startingInnerIndex..endingInnerIndex) {
             action(index, inner[innerIndex])
             index++
@@ -205,7 +205,7 @@ inline fun FastCharArray64.forEachInRange(range: LongRange, action: (Char) -> Un
     for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
         val inner = this.array[outerIndex]
         val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else 0
+        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
         for(innerIndex in startingInnerIndex..endingInnerIndex) {
             action(inner[innerIndex])
         }
@@ -224,7 +224,7 @@ inline fun FastCharArray64.forEachInRangeIndexed(range: LongRange, action: (inde
     for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
         val inner = this.array[outerIndex]
         val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else 0
+        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
         for(innerIndex in startingInnerIndex..endingInnerIndex) {
             action(index, inner[innerIndex])
             index++
@@ -261,7 +261,7 @@ inline fun FastShortArray64.forEachInRange(range: LongRange, action: (Short) -> 
     for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
         val inner = this.array[outerIndex]
         val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else 0
+        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
         for(innerIndex in startingInnerIndex..endingInnerIndex) {
             action(inner[innerIndex])
         }
@@ -280,7 +280,7 @@ inline fun FastShortArray64.forEachInRangeIndexed(range: LongRange, action: (ind
     for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
         val inner = this.array[outerIndex]
         val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else 0
+        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
         for(innerIndex in startingInnerIndex..endingInnerIndex) {
             action(index, inner[innerIndex])
             index++
@@ -317,7 +317,7 @@ inline fun FastIntArray64.forEachInRange(range: LongRange, action: (Int) -> Unit
     for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
         val inner = this.array[outerIndex]
         val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else 0
+        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
         for(innerIndex in startingInnerIndex..endingInnerIndex) {
             action(inner[innerIndex])
         }
@@ -336,7 +336,7 @@ inline fun FastIntArray64.forEachInRangeIndexed(range: LongRange, action: (index
     for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
         val inner = this.array[outerIndex]
         val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else 0
+        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
         for(innerIndex in startingInnerIndex..endingInnerIndex) {
             action(index, inner[innerIndex])
             index++
@@ -373,7 +373,7 @@ inline fun FastLongArray64.forEachInRange(range: LongRange, action: (Long) -> Un
     for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
         val inner = this.array[outerIndex]
         val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else 0
+        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
         for(innerIndex in startingInnerIndex..endingInnerIndex) {
             action(inner[innerIndex])
         }
@@ -392,7 +392,7 @@ inline fun FastLongArray64.forEachInRangeIndexed(range: LongRange, action: (inde
     for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
         val inner = this.array[outerIndex]
         val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else 0
+        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
         for(innerIndex in startingInnerIndex..endingInnerIndex) {
             action(index, inner[innerIndex])
             index++
@@ -429,7 +429,7 @@ inline fun FastFloatArray64.forEachInRange(range: LongRange, action: (Float) -> 
     for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
         val inner = this.array[outerIndex]
         val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else 0
+        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
         for(innerIndex in startingInnerIndex..endingInnerIndex) {
             action(inner[innerIndex])
         }
@@ -448,7 +448,7 @@ inline fun FastFloatArray64.forEachInRangeIndexed(range: LongRange, action: (ind
     for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
         val inner = this.array[outerIndex]
         val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else 0
+        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
         for(innerIndex in startingInnerIndex..endingInnerIndex) {
             action(index, inner[innerIndex])
             index++
@@ -485,7 +485,7 @@ inline fun FastDoubleArray64.forEachInRange(range: LongRange, action: (Double) -
     for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
         val inner = this.array[outerIndex]
         val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else 0
+        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
         for(innerIndex in startingInnerIndex..endingInnerIndex) {
             action(inner[innerIndex])
         }
@@ -504,7 +504,7 @@ inline fun FastDoubleArray64.forEachInRangeIndexed(range: LongRange, action: (in
     for(outerIndex in outerIndexOfFirst..outerIndexOfLast) {
         val inner = this.array[outerIndex]
         val startingInnerIndex = if(outerIndex == outerIndexOfFirst) innerIndexOfFirst else 0
-        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else 0
+        val endingInnerIndex = if(outerIndex == outerIndexOfLast) innerIndexOfLast else BigArrays.SEGMENT_SIZE - 1
         for(innerIndex in startingInnerIndex..endingInnerIndex) {
             action(index, inner[innerIndex])
             index++

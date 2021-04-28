@@ -38,17 +38,36 @@ class FastDoubleArray64 : DoubleArray64 {
     }
     /** Creates a new array of the specified [size], with all elements initialized to zero. */
     constructor(size: Long) : this(size, { 0.0 })
-    /** Creates a copy of the given FastUtil BigArray */
-    constructor(array: Array<DoubleArray>) {
-        this.size = BigArrays.length(array)
-        this.array = BigArrays.copy(array)
-    }
+
     /** Creates a copy of the given Array64 */
     constructor(array: FastDoubleArray64) : this(array.array)
-    /** Creates a new array from the given standard library array */
-    constructor(array: DoubleArray) {
+    /**
+     * Creates a new array from the given FastUtil BigArray, either by copying its contents or simply wrapping it.
+     * @param array the array in question
+     * @param copy whether to copy (true) the array or directly use it as the internal array (false)
+     */
+    constructor(array: Array<DoubleArray>, copy: Boolean = true) {
+        this.size = BigArrays.length(array)
+        this.array = if(copy) BigArrays.copy(array) else array
+    }
+    /**
+     * Creates a new array from the given standard library array, either by copying its contents or simply wrapping it.
+     * @param array the array in question
+     * @param copy whether to copy (true) the array or directly use it as the internal array (false)
+     */
+    constructor(array: DoubleArray, copy: Boolean = true) {
         this.size = array.size.toLong()
-        this.array = BigArrays.wrap(array)
+        this.array = if(copy) BigArrays.wrap(array) else Array(1) { array }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if(other === this) return true
+        if(other !is FastDoubleArray64) return false
+        if(this.size != other.size) return false
+        val thisIterator = this.iterator()
+        val otherIterator = other.iterator()
+        while(thisIterator.hasNext()) if(thisIterator.next() != otherIterator.next()) return false
+        return true
     }
 
     override fun copy(): FastDoubleArray64 = FastDoubleArray64(this)

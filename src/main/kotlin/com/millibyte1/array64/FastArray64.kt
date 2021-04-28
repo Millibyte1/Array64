@@ -18,15 +18,33 @@ class FastArray64<E> : Array64<E> {
 
     /** Creates a copy of the given Array64. */
     constructor(array: FastArray64<E>) : this(array.array)
-    /** Creates an Array64 copy of the given FastUtil BigArray. */
-    constructor(array: Array<Array<E>>) {
+    /**
+     * Creates a new array from the given FastUtil BigArray, either by copying its contents or simply wrapping it.
+     * @param array the array in question
+     * @param copy whether to copy (true) the array or directly use it as the internal array (false)
+     */
+    constructor(array: Array<Array<E>>, copy: Boolean = true) {
         this.size = BigArrays.length(array)
-        this.array = BigArrays.copy(array)
+        this.array = if(copy) BigArrays.copy(array) else array
     }
-    /** Creates an Array64 copy of the given standard library array. */
-    constructor(array: Array<E>) {
+    /**
+     * Creates a new array from the given standard library array, either by copying its contents or simply wrapping it.
+     * @param array the array in question
+     * @param copy whether to copy (true) the array or directly use it as the internal array (false)
+     */
+    constructor(array: Array<E>, copy: Boolean = true) {
         this.size = array.size.toLong()
-        this.array = BigArrays.wrap(array)
+        this.array = if(copy) BigArrays.wrap(array) else Array(1) { array }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if(other === this) return true
+        if(other !is FastArray64<*>) return false
+        if(this.size != other.size) return false
+        val thisIterator = this.iterator()
+        val otherIterator = other.iterator()
+        while(thisIterator.hasNext()) if(thisIterator.next() != otherIterator.next()) return false
+        return true
     }
 
     override fun copy(): FastArray64<E> = FastArray64(this)

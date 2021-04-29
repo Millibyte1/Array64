@@ -3,8 +3,8 @@ package com.millibyte1.array64
 import it.unimi.dsi.fastutil.BigArrays
 
 /*
- * There's a metric fuckton of duplicated code in this file because it's impossible to generalize without tanking performance
- * (assuming there's no way to improve the iterators so they rival the performance of direct indexing).
+ * A collection of type-specific implementations for higher order collections processing functions, which
+ * are more performant than the generic iterator-based implementations that can be
  */
 
 /** Performs the given [action] on each element. */

@@ -15,23 +15,10 @@ class IOUtilsTest {
 
     @Test
     @Order(1)
-    fun testReadFromFile() {
-        val array = readFileToByteArray64(File("src/test/resources/bigfile.db"))
-        var sum = 0L
-        for(i in 0 until array.array.lastIndex) {
-            val segmentSize = array.array[i].size
-            assertEquals(array.array[i].size, BigArrays.SEGMENT_SIZE)
-            sum += segmentSize
-        }
-        sum += array.array.last().size
-        assertEquals(sum, array.size)
-    }
-
-    @Test
-    @Order(2)
-    fun testWriteToFile() {
-        val array = FastByteArray64(BigArrays.SEGMENT_SIZE.toLong() + 1)
-        val file = File("src/test/resources/bigfileout.db")
+    fun testReadAndWrite() {
+        // writes an array to a file then reads it back, checks they're identical. fails if read isn't working
+        val array = FastByteArray64(BigArrays.SEGMENT_SIZE.toLong() + 1) { 17 }
+        val file = File("src/test/resources/bigfile.db")
         file.delete()
         file.createNewFile()
         writeByteArray64ToFile(file, array)

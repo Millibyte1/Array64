@@ -16,8 +16,8 @@ class FastByteArray64 : ByteArray64 {
     override val size: Long
     @PublishedApi internal val array: Array<ByteArray>
 
-    /** Creates a new array of the specified [size], with all elements initialized according to the given [init] function */
-    constructor(size: Long, init: (Long) -> Byte) {
+    /** Creates a new array of the specified [size], with all elements initialized to zero. */
+    constructor(size: Long) {
         if(size > MAX_SIZE || size <= 0) throw IllegalArgumentException("Invalid size provided.")
         this.size = size
         //calculates the number of complete inner arrays and the size of the incomplete last inner array
@@ -27,17 +27,7 @@ class FastByteArray64 : ByteArray64 {
         array =
             if(innerSize == 0) Array(fullArrays) { ByteArray(BigArrays.SEGMENT_SIZE) }
             else Array(fullArrays + 1) { i -> if(i == fullArrays) ByteArray(innerSize) else ByteArray(BigArrays.SEGMENT_SIZE) }
-        //initializes the elements of the array using cache-aware iteration as per FastUtil specification
-        var index = 0L
-        for(inner in array) {
-            for(innerIndex in inner.indices) {
-                inner[innerIndex] = init(index)
-                index++
-            }
-        }
     }
-    /** Creates a new array of the specified [size], with all elements initialized to zero. */
-    constructor(size: Long) : this(size, { 0 })
 
     /** Creates a copy of the given Array64 */
     constructor(array: FastByteArray64) : this(array.array)
@@ -66,7 +56,7 @@ class FastByteArray64 : ByteArray64 {
         if(this.size != other.size) return false
         val thisIterator = this.iterator()
         val otherIterator = other.iterator()
-        while(thisIterator.hasNext()) if(thisIterator.next() != otherIterator.next()) return false
+        while(thisIterator.hasNext()) if(thisIterator.nextByte() != otherIterator.nextByte()) return false
         return true
     }
 
@@ -87,13 +77,34 @@ class FastByteArray64 : ByteArray64 {
      * Returns an iterator to the element at the given [index].
      * @throws IllegalArgumentException if an invalid index is provided
      */
-    override fun iterator(index: Long): LongIndexedBidirectionalByteIterator {
+    override fun iterator(index: Long): ByteArray64Iterator {
         if(index < 0 || index >= this.size) throw IllegalArgumentException("Invalid index provided.")
         return FastByteArray64Iterator(this, index)
     }
-    override operator fun iterator(): LongIndexedBidirectionalByteIterator = FastByteArray64Iterator(this, 0)
+    override operator fun iterator(): ByteArray64Iterator = FastByteArray64Iterator(this, 0)
 
     companion object {
+        /**
+         * Creates a new array of the specified [size], with all elements initialized according to the given [init] function.
+         *
+         * This is a pseudo-constructor. Reified type parameters are needed for generic 2D array creation but aren't possible
+         * with real constructors, so an inlined operator function is used to act like a constructor.
+         */
+        inline operator fun invoke(size: Long, init: (Long) -> Byte): FastByteArray64 {
+            val retval = FastByteArray64(size)
+            //initializes the elements of the array using cache-aware iteration as per FastUtil specification
+            var index = 0L
+            for(inner in retval.array) {
+                var innerIndex = 0
+                while(innerIndex < inner.size) {
+                    inner[innerIndex] = init(index)
+                    innerIndex++
+                    index++
+                }
+            }
+            return retval
+        }
+        /** The theoretical maximum number of elements that can fit in this array */
         const val MAX_SIZE = BigArrays.SEGMENT_SIZE.toLong() * Int.MAX_VALUE
     }
 }
@@ -104,7 +115,7 @@ class FastByteArray64 : ByteArray64 {
  * @param array the array to iterate over
  * @param index the index to start at
  */
-private class FastByteArray64Iterator(private val array: FastByteArray64, index: Long) : LongIndexedBidirectionalByteIterator() {
+private class FastByteArray64Iterator(private val array: FastByteArray64, index: Long) : ByteArray64Iterator() {
     override var index: Long = index
         private set
     private var outerIndex = BigArrays.segment(index)
@@ -124,6 +135,9 @@ private class FastByteArray64Iterator(private val array: FastByteArray64, index:
         val retval = inner[innerIndex]
         decreaseIndices()
         return retval
+    }
+    override fun setByte(element: Byte) {
+        inner[innerIndex] = element
     }
     //increases the current index and the cached inner array
     private fun increaseIndices() {

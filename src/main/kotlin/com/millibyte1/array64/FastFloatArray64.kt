@@ -16,8 +16,8 @@ class FastFloatArray64 : FloatArray64 {
     override val size: Long
     @PublishedApi internal val array: Array<FloatArray>
 
-    /** Creates a new array of the specified [size], with all elements initialized according to the given [init] function */
-    constructor(size: Long, init: (Long) -> Float) {
+    /** Creates a new array of the specified [size], with all elements initialized to zero. */
+    constructor(size: Long) {
         if(size > MAX_SIZE || size <= 0) throw IllegalArgumentException("Invalid size provided.")
         this.size = size
         //calculates the number of complete inner arrays and the size of the incomplete last inner array
@@ -27,17 +27,7 @@ class FastFloatArray64 : FloatArray64 {
         array =
             if(innerSize == 0) Array(fullArrays) { FloatArray(BigArrays.SEGMENT_SIZE) }
             else Array(fullArrays + 1) { i -> if(i == fullArrays) FloatArray(innerSize) else FloatArray(BigArrays.SEGMENT_SIZE) }
-        //initializes the elements of the array using cache-aware iteration as per FastUtil specification
-        var index = 0L
-        for(inner in array) {
-            for(innerIndex in inner.indices) {
-                inner[innerIndex] = init(index)
-                index++
-            }
-        }
     }
-    /** Creates a new array of the specified [size], with all elements initialized to zero. */
-    constructor(size: Long) : this(size, { 0.0F })
 
     /** Creates a copy of the given Array64 */
     constructor(array: FastFloatArray64) : this(array.array)
@@ -66,7 +56,7 @@ class FastFloatArray64 : FloatArray64 {
         if(this.size != other.size) return false
         val thisIterator = this.iterator()
         val otherIterator = other.iterator()
-        while(thisIterator.hasNext()) if(thisIterator.next() != otherIterator.next()) return false
+        while(thisIterator.hasNext()) if(thisIterator.nextFloat() != otherIterator.nextFloat()) return false
         return true
     }
 
@@ -87,13 +77,34 @@ class FastFloatArray64 : FloatArray64 {
      * Returns an iterator to the element at the given [index].
      * @throws IllegalArgumentException if an invalid index is provided
      */
-    override fun iterator(index: Long): LongIndexedBidirectionalFloatIterator {
+    override fun iterator(index: Long): FloatArray64Iterator {
         if(index < 0 || index >= this.size) throw IllegalArgumentException("Invalid index provided.")
         return FastFloatArray64Iterator(this, index)
     }
-    override operator fun iterator(): LongIndexedBidirectionalFloatIterator = FastFloatArray64Iterator(this, 0)
+    override operator fun iterator(): FloatArray64Iterator = FastFloatArray64Iterator(this, 0)
 
     companion object {
+        /**
+         * Creates a new array of the specified [size], with all elements initialized according to the given [init] function.
+         *
+         * This is a pseudo-constructor. Reified type parameters are needed for generic 2D array creation but aren't possible
+         * with real constructors, so an inlined operator function is used to act like a constructor.
+         */
+        inline operator fun invoke(size: Long, init: (Long) -> Float): FastFloatArray64 {
+            val retval = FastFloatArray64(size)
+            //initializes the elements of the array using cache-aware iteration as per FastUtil specification
+            var index = 0L
+            for(inner in retval.array) {
+                var innerIndex = 0
+                while(innerIndex < inner.size) {
+                    inner[innerIndex] = init(index)
+                    innerIndex++
+                    index++
+                }
+            }
+            return retval
+        }
+        /** The theoretical maximum number of elements that can fit in this array */
         const val MAX_SIZE = BigArrays.SEGMENT_SIZE.toLong() * Int.MAX_VALUE
     }
 }
@@ -104,7 +115,7 @@ class FastFloatArray64 : FloatArray64 {
  * @param array the array to iterate over
  * @param index the index to start at
  */
-private class FastFloatArray64Iterator(private val array: FastFloatArray64, index: Long) : LongIndexedBidirectionalFloatIterator() {
+private class FastFloatArray64Iterator(private val array: FastFloatArray64, index: Long) : FloatArray64Iterator() {
     override var index: Long = index
         private set
     private var outerIndex = BigArrays.segment(index)
@@ -114,21 +125,26 @@ private class FastFloatArray64Iterator(private val array: FastFloatArray64, inde
     override fun hasNext(): Boolean = index < array.size
     override fun hasPrevious(): Boolean = index > 0
     override fun nextFloat(): Float {
+        if(!hasNext()) throw NoSuchElementException()
         val retval = inner[innerIndex]
         increaseIndices()
         return retval
     }
     override fun previousFloat(): Float {
+        if(!hasPrevious()) throw NoSuchElementException()
         val retval = inner[innerIndex]
         decreaseIndices()
         return retval
+    }
+    override fun setFloat(element: Float) {
+        inner[innerIndex] = element
     }
     //increases the current index and the cached inner array
     private fun increaseIndices() {
         if(innerIndex == BigArrays.SEGMENT_SIZE - 1) {
             innerIndex = 0
             outerIndex++
-            inner = array.array[outerIndex]
+            if(index != array.lastIndex) inner = array.array[outerIndex]
         }
         else innerIndex++
         index++
@@ -138,7 +154,7 @@ private class FastFloatArray64Iterator(private val array: FastFloatArray64, inde
         if(innerIndex == 0) {
             innerIndex = BigArrays.SEGMENT_SIZE - 1
             outerIndex--
-            inner = array.array[outerIndex]
+            if(index != 0L) inner = array.array[outerIndex]
         }
         else innerIndex--
         index--

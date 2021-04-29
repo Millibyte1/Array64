@@ -64,11 +64,11 @@ class FastArray64<E> : Array64<E> {
      * Returns an iterator to the element at the given [index].
      * @throws IllegalArgumentException if an invalid index is provided
      */
-    override fun iterator(index: Long): LongIndexedBidirectionalIterator<E> {
+    override fun iterator(index: Long): Array64Iterator<E> {
         if(index < 0 || index >= this.size) throw IllegalArgumentException("Invalid index provided.")
         return FastArray64Iterator(this, index)
     }
-    override operator fun iterator(): LongIndexedBidirectionalIterator<E> = FastArray64Iterator(this, 0)
+    override operator fun iterator(): Array64Iterator<E> = FastArray64Iterator(this, 0)
 
     companion object {
         /**
@@ -90,7 +90,7 @@ class FastArray64<E> : Array64<E> {
  * @param array the array to iterate over
  * @param index the index to start at
  */
-private class FastArray64Iterator<E>(private val array: FastArray64<E>, index: Long) : LongIndexedBidirectionalIterator<E> {
+private class FastArray64Iterator<E>(private val array: FastArray64<E>, index: Long) : Array64Iterator<E> {
 
     override var index: Long = index
         private set
@@ -109,6 +109,9 @@ private class FastArray64Iterator<E>(private val array: FastArray64<E>, index: L
         val retval = inner[innerIndex]
         decreaseIndices()
         return retval
+    }
+    override fun set(element: E) {
+        inner[innerIndex] = element
     }
     //increases the current index and the cached inner array
     private fun increaseIndices() {

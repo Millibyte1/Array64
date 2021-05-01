@@ -94,15 +94,8 @@ class FastArray64Test {
         val time2 = measureTimeMillis {
             array32.forEachIndexed { i, e -> assertEquals(e, (i % 8).toByte()) }
         }
-        val time3 = measureTimeMillis {
-            val foo = array[0]
-            for(i in 0 until array.size) {
-                assertEquals(foo, 0)
-            }
-        }
         println("time1: $time1")
         println("time2: $time2")
-        println("time3: $time3")
     }
 
     companion object {

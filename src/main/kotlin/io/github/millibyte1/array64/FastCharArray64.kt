@@ -1,29 +1,42 @@
-package com.millibyte1.array64
+package io.github.millibyte1.array64
 
 import it.unimi.dsi.fastutil.BigArrays
 
 /**
- * A 64-bit-indexed generic array with an interface mirroring that of the standard library class [Array].
+ * A 64-bit-indexed byte array with an interface mirroring that of the standard library class [CharArray].
  *
  * Internally uses a 2D array and the FastUtil [BigArrays] library.
  *
- * @property size the number of elements in this array.
- * @property array the 2D array used internally. This should not be used except when extending the API.
+ * @property size the number of elements in this array
+ * @property array the 2D array used internally. This should not be used except by extension functions.
  *
  */
-class FastArray64<E> : Array64<E> {
+class FastCharArray64 : CharArray64 {
 
     override val size: Long
-    @PublishedApi internal val array: Array<Array<E>>
+    @PublishedApi internal val array: Array<CharArray>
 
-    /** Creates a copy of the given Array64. */
-    constructor(array: FastArray64<E>) : this(array.array)
+    /** Creates a new array of the specified [size], with all elements initialized to zero. */
+    constructor(size: Long) {
+        if(size > MAX_SIZE || size <= 0) throw IllegalArgumentException("Invalid size provided.")
+        this.size = size
+        //calculates the number of complete inner arrays and the size of the incomplete last inner array
+        val fullArrays = (size / BigArrays.SEGMENT_SIZE).toInt()
+        val innerSize = (size % BigArrays.SEGMENT_SIZE).toInt()
+        //allocates the array
+        array =
+            if(innerSize == 0) Array(fullArrays) { CharArray(BigArrays.SEGMENT_SIZE) }
+            else Array(fullArrays + 1) { i -> if(i == fullArrays) CharArray(innerSize) else CharArray(BigArrays.SEGMENT_SIZE) }
+    }
+
+    /** Creates a copy of the given Array64 */
+    constructor(array: FastCharArray64) : this(array.array)
     /**
      * Creates a new array from the given FastUtil BigArray, either by copying its contents or simply wrapping it.
      * @param array the array in question
      * @param copy whether to copy (true) the array or directly use it as the internal array (false)
      */
-    constructor(array: Array<Array<E>>, copy: Boolean = true) {
+    constructor(array: Array<CharArray>, copy: Boolean = true) {
         this.size = BigArrays.length(array)
         this.array = if(copy) BigArrays.copy(array) else array
     }
@@ -32,30 +45,30 @@ class FastArray64<E> : Array64<E> {
      * @param array the array in question
      * @param copy whether to copy (true) the array or directly use it as the internal array (false)
      */
-    constructor(array: Array<E>, copy: Boolean = true) {
+    constructor(array: CharArray, copy: Boolean = true) {
         this.size = array.size.toLong()
         this.array = if(copy) BigArrays.wrap(array) else Array(1) { array }
     }
 
     override fun equals(other: Any?): Boolean {
         if(other === this) return true
-        if(other !is FastArray64<*>) return false
+        if(other !is FastCharArray64) return false
         if(this.size != other.size) return false
         val thisIterator = this.iterator()
         val otherIterator = other.iterator()
-        while(thisIterator.hasNext()) if(thisIterator.next() != otherIterator.next()) return false
+        while(thisIterator.hasNext()) if(thisIterator.nextChar() != otherIterator.nextChar()) return false
         return true
     }
 
-    override fun copy(): FastArray64<E> = FastArray64(this)
+    override fun copy(): FastCharArray64 = FastCharArray64(this)
 
-    /** Returns the element at the given [index]. This method can be called using the index operator. */
-    override operator fun get(index: Long): E {
+    /** Returns the array at the given [index]. This method can be called using the index operator. */
+    override operator fun get(index: Long): Char {
         if(index >= this.size || index < 0) throw NoSuchElementException()
         return BigArrays.get(array, index)
     }
     /** Sets the element at the given [index] to the given [value]. This method can be called using the index operator. */
-    override operator fun set(index: Long, value: E) {
+    override operator fun set(index: Long, value: Char) {
         if(index >= this.size || index < 0) throw NoSuchElementException()
         BigArrays.set(array, index, value)
     }
@@ -64,11 +77,11 @@ class FastArray64<E> : Array64<E> {
      * Returns an iterator to the element at the given [index].
      * @throws IllegalArgumentException if an invalid index is provided
      */
-    override fun iterator(index: Long): Array64Iterator<E> {
+    override fun iterator(index: Long): CharArray64Iterator {
         if(index < 0 || index >= this.size) throw IllegalArgumentException("Invalid index provided.")
-        return FastArray64Iterator(this, index)
+        return FastCharArray64Iterator(this, index)
     }
-    override operator fun iterator(): Array64Iterator<E> = FastArray64Iterator(this, 0)
+    override operator fun iterator(): CharArray64Iterator = FastCharArray64Iterator(this, 0)
 
     companion object {
         /**
@@ -77,21 +90,32 @@ class FastArray64<E> : Array64<E> {
          * This is a pseudo-constructor. Reified type parameters are needed for generic 2D array creation but aren't possible
          * with real constructors, so an inlined operator function is used to act like a constructor.
          */
-        inline operator fun <reified E> invoke(size: Long, crossinline init: (Long) -> E): FastArray64<E> = makeTypedArray64(size, init)
+        inline operator fun invoke(size: Long, init: (Long) -> Char): FastCharArray64 {
+            val retval = FastCharArray64(size)
+            //initializes the elements of the array using cache-aware iteration as per FastUtil specification
+            var index = 0L
+            for(inner in retval.array) {
+                var innerIndex = 0
+                while(innerIndex < inner.size) {
+                    inner[innerIndex] = init(index)
+                    innerIndex++
+                    index++
+                }
+            }
+            return retval
+        }
         /** The theoretical maximum number of elements that can fit in this array */
         const val MAX_SIZE = BigArrays.SEGMENT_SIZE.toLong() * Int.MAX_VALUE
     }
 }
 
 /**
- * A simple efficient bidirectional iterator for the FastArray64 class.
- * @param E the type of element stored in the array
+ * A simple efficient bidirectional iterator for the FastCharArray64 class.
  * @constructor Constructs an iterator to the given [index] in the given [array].
  * @param array the array to iterate over
  * @param index the index to start at
  */
-private class FastArray64Iterator<E>(private val array: FastArray64<E>, index: Long) : Array64Iterator<E> {
-
+private class FastCharArray64Iterator(private val array: FastCharArray64, index: Long) : CharArray64Iterator() {
     override var index: Long = index
         private set
     private var outerIndex = BigArrays.segment(index)
@@ -99,18 +123,20 @@ private class FastArray64Iterator<E>(private val array: FastArray64<E>, index: L
     private var inner = array.array[outerIndex]
 
     override fun hasNext(): Boolean = index < array.size
-    override fun hasPrevious(): Boolean = index >= 0
-    override fun next(): E {
+    override fun hasPrevious(): Boolean = index > 0
+    override fun nextChar(): Char {
+        if(!hasNext()) throw NoSuchElementException()
         val retval = inner[innerIndex]
         increaseIndices()
         return retval
     }
-    override fun previous(): E {
+    override fun previousChar(): Char {
+        if(!hasPrevious()) throw NoSuchElementException()
         val retval = inner[innerIndex]
         decreaseIndices()
         return retval
     }
-    override fun set(element: E) {
+    override fun setChar(element: Char) {
         inner[innerIndex] = element
     }
     //increases the current index and the cached inner array
@@ -118,7 +144,7 @@ private class FastArray64Iterator<E>(private val array: FastArray64<E>, index: L
         if(innerIndex == BigArrays.SEGMENT_SIZE - 1) {
             innerIndex = 0
             outerIndex++
-            inner = array.array[outerIndex]
+            if(index != array.lastIndex) inner = array.array[outerIndex]
         }
         else innerIndex++
         index++
@@ -128,7 +154,7 @@ private class FastArray64Iterator<E>(private val array: FastArray64<E>, index: L
         if(innerIndex == 0) {
             innerIndex = BigArrays.SEGMENT_SIZE - 1
             outerIndex--
-            inner = array.array[outerIndex]
+            if(index != 0L) inner = array.array[outerIndex]
         }
         else innerIndex--
         index--

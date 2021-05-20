@@ -1,4 +1,4 @@
-package com.millibyte1.array64
+package io.github.millibyte1.array64
 
 import it.unimi.dsi.fastutil.BigArrays
 import org.apache.commons.io.FileUtils

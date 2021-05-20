@@ -1,4 +1,4 @@
-package com.millibyte1.array64
+package io.github.millibyte1.array64
 
 import it.unimi.dsi.fastutil.BigArrays
 
@@ -16,32 +16,30 @@ import kotlin.test.assertTrue
 import kotlin.test.assertFalse
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-class FastByteArray64Test {
+class FastArray64Test {
 
     @Test
-    @Order(0)
+    @Order(1)
     fun testGet() {
-        val array = FastByteArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
+        val array = FastArray64(TEST_SMALL_ARRAY_SIZE) { i -> (i % 8).toByte() }
         array.forEachIndexed { i, e -> assertEquals(e, (i % 8).toByte()) }
     }
     @Test
-    @Order(1)
+    @Order(2)
     fun testSet() {
-        val array = FastByteArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
-        val iterator = array.iterator()
-        var index = 0L
-        while(iterator.hasNext()) {
-            val element = iterator.next()
-            array[index]--
-            assertNotEquals(element, array[index])
-            array[index] = element
-            index++
+        val array = FastArray64(TEST_SMALL_ARRAY_SIZE) { i -> (i % 8).toByte() }
+        array.forEachIndexed {
+            i, e -> run {
+                array[i] = (e - 1).toByte()
+                assertNotEquals(e, array[i])
+                array[i] = e
+            }
         }
     }
     @Test
-    @Order(2)
+    @Order(3)
     fun testForEachInRange() {
-        val array = FastByteArray64(TEST_MEDIUM_ARRAY_SIZE) { 0 }
+        val array = FastArray64(TEST_MEDIUM_ARRAY_SIZE) { 0.toByte() }
         array[0] = 1
         array[5] = 1
         array[TEST_SMALL_ARRAY_SIZE + 3] = 1
@@ -52,9 +50,10 @@ class FastByteArray64Test {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     fun testCopy() {
-        val array = FastByteArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
+        //I don't have the RAM to test copy with even one full inner array
+        val array = FastArray64(10000000) { i -> (i % 8).toByte() }
         val copy = array.copy()
         assertEquals(array.size, copy.size)
         assertTrue(array.contentEquals(copy))
@@ -65,29 +64,33 @@ class FastByteArray64Test {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     fun testRandomAccessTimes() {
         val random = Random(-234013250)
-        val array = FastByteArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
+        val array = FastArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
         val indices = LongArray(10000000) { random.nextLong(10000000) }
         val time1 = measureTimeMillis {
-            for(i in indices) assertTrue(array[i] >= 0)
+            for(i in indices) {
+                assertTrue(array[i] >= 0)
+            }
         }
         val array32 = ByteArray(TEST_MEDIUM_ARRAY_SIZE.toInt()) { i -> (i % 8).toByte() }
         val time2 = measureTimeMillis {
-            for(i in indices) assertTrue(array32[i.toInt()] >= 0)
+            for(i in indices) {
+                assertTrue(array32[i.toInt()] >= 0)
+            }
         }
         println("time1: $time1")
         println("time2: $time2")
     }
     @Test
-    @Order(5)
+    @Order(6)
     fun testSequentialAccessTimes() {
-        val array = FastByteArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
+        val array = FastArray64(10000000) { i -> (i % 8).toByte() }
         val time1 = measureTimeMillis {
             array.forEachIndexed { i, e -> assertEquals(e, (i % 8).toByte()) }
         }
-        val array32 = ByteArray(TEST_MEDIUM_ARRAY_SIZE.toInt()) { i -> (i % 8).toByte() }
+        val array32 = Array(10000000) { i -> (i % 8).toByte() }
         val time2 = measureTimeMillis {
             array32.forEachIndexed { i, e -> assertEquals(e, (i % 8).toByte()) }
         }
@@ -98,7 +101,6 @@ class FastByteArray64Test {
     companion object {
         const val TEST_SMALL_ARRAY_SIZE = BigArrays.SEGMENT_SIZE.toLong() + 1
         const val TEST_MEDIUM_ARRAY_SIZE = BigArrays.SEGMENT_SIZE.toLong() * 2
-        const val TEST_LARGE_ARRAY_SIZE = Int.MAX_VALUE.toLong() / 2
+        const val TEST_LARGE_ARRAY_SIZE = Int.MAX_VALUE.toLong() - 8
     }
-
 }

@@ -1,4 +1,4 @@
-package com.millibyte1.array64
+package io.github.millibyte1.array64
 
 /*
  * This file contains a collection of iterator interfaces and abstract classes which are used by this project.

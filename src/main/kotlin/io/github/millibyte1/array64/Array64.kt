@@ -1,4 +1,4 @@
-package com.millibyte1.array64
+package io.github.millibyte1.array64
 
 /**
  * Base interface for huge arrays which can store more elements than can be indexed by an [Int].

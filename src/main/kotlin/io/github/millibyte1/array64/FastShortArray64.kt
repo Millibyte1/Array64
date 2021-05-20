@@ -1,9 +1,9 @@
-package com.millibyte1.array64
+package io.github.millibyte1.array64
 
 import it.unimi.dsi.fastutil.BigArrays
 
 /**
- * A 64-bit-indexed byte array with an interface mirroring that of the standard library class [CharArray].
+ * A 64-bit-indexed byte array with an interface mirroring that of the standard library class [ShortArray].
  *
  * Internally uses a 2D array and the FastUtil [BigArrays] library.
  *
@@ -11,10 +11,10 @@ import it.unimi.dsi.fastutil.BigArrays
  * @property array the 2D array used internally. This should not be used except by extension functions.
  *
  */
-class FastCharArray64 : CharArray64 {
+class FastShortArray64 : ShortArray64 {
 
     override val size: Long
-    @PublishedApi internal val array: Array<CharArray>
+    @PublishedApi internal val array: Array<ShortArray>
 
     /** Creates a new array of the specified [size], with all elements initialized to zero. */
     constructor(size: Long) {
@@ -25,18 +25,18 @@ class FastCharArray64 : CharArray64 {
         val innerSize = (size % BigArrays.SEGMENT_SIZE).toInt()
         //allocates the array
         array =
-            if(innerSize == 0) Array(fullArrays) { CharArray(BigArrays.SEGMENT_SIZE) }
-            else Array(fullArrays + 1) { i -> if(i == fullArrays) CharArray(innerSize) else CharArray(BigArrays.SEGMENT_SIZE) }
+            if(innerSize == 0) Array(fullArrays) { ShortArray(BigArrays.SEGMENT_SIZE) }
+            else Array(fullArrays + 1) { i -> if(i == fullArrays) ShortArray(innerSize) else ShortArray(BigArrays.SEGMENT_SIZE) }
     }
 
     /** Creates a copy of the given Array64 */
-    constructor(array: FastCharArray64) : this(array.array)
+    constructor(array: FastShortArray64) : this(array.array)
     /**
      * Creates a new array from the given FastUtil BigArray, either by copying its contents or simply wrapping it.
      * @param array the array in question
      * @param copy whether to copy (true) the array or directly use it as the internal array (false)
      */
-    constructor(array: Array<CharArray>, copy: Boolean = true) {
+    constructor(array: Array<ShortArray>, copy: Boolean = true) {
         this.size = BigArrays.length(array)
         this.array = if(copy) BigArrays.copy(array) else array
     }
@@ -45,30 +45,30 @@ class FastCharArray64 : CharArray64 {
      * @param array the array in question
      * @param copy whether to copy (true) the array or directly use it as the internal array (false)
      */
-    constructor(array: CharArray, copy: Boolean = true) {
+    constructor(array: ShortArray, copy: Boolean = true) {
         this.size = array.size.toLong()
         this.array = if(copy) BigArrays.wrap(array) else Array(1) { array }
     }
 
     override fun equals(other: Any?): Boolean {
         if(other === this) return true
-        if(other !is FastCharArray64) return false
+        if(other !is FastShortArray64) return false
         if(this.size != other.size) return false
         val thisIterator = this.iterator()
         val otherIterator = other.iterator()
-        while(thisIterator.hasNext()) if(thisIterator.nextChar() != otherIterator.nextChar()) return false
+        while(thisIterator.hasNext()) if(thisIterator.nextShort() != otherIterator.nextShort()) return false
         return true
     }
 
-    override fun copy(): FastCharArray64 = FastCharArray64(this)
+    override fun copy(): FastShortArray64 = FastShortArray64(this)
 
     /** Returns the array at the given [index]. This method can be called using the index operator. */
-    override operator fun get(index: Long): Char {
+    override operator fun get(index: Long): Short {
         if(index >= this.size || index < 0) throw NoSuchElementException()
         return BigArrays.get(array, index)
     }
     /** Sets the element at the given [index] to the given [value]. This method can be called using the index operator. */
-    override operator fun set(index: Long, value: Char) {
+    override operator fun set(index: Long, value: Short) {
         if(index >= this.size || index < 0) throw NoSuchElementException()
         BigArrays.set(array, index, value)
     }
@@ -77,11 +77,11 @@ class FastCharArray64 : CharArray64 {
      * Returns an iterator to the element at the given [index].
      * @throws IllegalArgumentException if an invalid index is provided
      */
-    override fun iterator(index: Long): CharArray64Iterator {
+    override fun iterator(index: Long): ShortArray64Iterator {
         if(index < 0 || index >= this.size) throw IllegalArgumentException("Invalid index provided.")
-        return FastCharArray64Iterator(this, index)
+        return FastShortArray64Iterator(this, index)
     }
-    override operator fun iterator(): CharArray64Iterator = FastCharArray64Iterator(this, 0)
+    override operator fun iterator(): ShortArray64Iterator = FastShortArray64Iterator(this, 0)
 
     companion object {
         /**
@@ -90,8 +90,8 @@ class FastCharArray64 : CharArray64 {
          * This is a pseudo-constructor. Reified type parameters are needed for generic 2D array creation but aren't possible
          * with real constructors, so an inlined operator function is used to act like a constructor.
          */
-        inline operator fun invoke(size: Long, init: (Long) -> Char): FastCharArray64 {
-            val retval = FastCharArray64(size)
+        inline operator fun invoke(size: Long, init: (Long) -> Short): FastShortArray64 {
+            val retval = FastShortArray64(size)
             //initializes the elements of the array using cache-aware iteration as per FastUtil specification
             var index = 0L
             for(inner in retval.array) {
@@ -110,12 +110,12 @@ class FastCharArray64 : CharArray64 {
 }
 
 /**
- * A simple efficient bidirectional iterator for the FastCharArray64 class.
+ * A simple efficient bidirectional iterator for the FastShortArray64 class.
  * @constructor Constructs an iterator to the given [index] in the given [array].
  * @param array the array to iterate over
  * @param index the index to start at
  */
-private class FastCharArray64Iterator(private val array: FastCharArray64, index: Long) : CharArray64Iterator() {
+private class FastShortArray64Iterator(private val array: FastShortArray64, index: Long) : ShortArray64Iterator() {
     override var index: Long = index
         private set
     private var outerIndex = BigArrays.segment(index)
@@ -124,19 +124,19 @@ private class FastCharArray64Iterator(private val array: FastCharArray64, index:
 
     override fun hasNext(): Boolean = index < array.size
     override fun hasPrevious(): Boolean = index > 0
-    override fun nextChar(): Char {
+    override fun nextShort(): Short {
         if(!hasNext()) throw NoSuchElementException()
         val retval = inner[innerIndex]
         increaseIndices()
         return retval
     }
-    override fun previousChar(): Char {
+    override fun previousShort(): Short {
         if(!hasPrevious()) throw NoSuchElementException()
         val retval = inner[innerIndex]
         decreaseIndices()
         return retval
     }
-    override fun setChar(element: Char) {
+    override fun setShort(element: Short) {
         inner[innerIndex] = element
     }
     //increases the current index and the cached inner array

@@ -1,43 +1,74 @@
-## Array64
 Array64 is a light-weight library for very large arrays with an interface closely mirroring that of Kotlin standard library arrays.
 
-Array64 seeks to be three things: easy to use, easy to adapt existing logic to, and brutally efficient.
+<!-- TODO: add badges for maven and begin using a CI tool -->
 
-## Features
-Array64 provides highly optimized implementations of 64-bit arrays for generic and primitive types, 
-as well as utilities for IO and functional data processing (à la Java 8 Streams and Kotlin Sequences).
+Array64 seeks to be three things: easy to use, easy to adapt existing logic to, and optimally efficient.
 
-- [x] Array types which can store a virtually unlimited number of elements (2<sup>58</sup> or 2<sup>64</sup>-1 depending on the implementation)
-- [x] Both resizable and fixed-size arrays (planned)
-- [x] Both generic and primitive array types
-- [x] Overloaded subscript operator for get/set
-- [x] Efficient iterators and higher order functions for all types
-- [x] Utilities for reading and writing to I/O streams and files
+## Overview
+<!-- TODO: Table of contents -->
 
-## API Overview
+## Essential Information
+### Accessing the Documentation
+The complete KDoc can be accessed at https://millibyte1.github.io. The complete JavaDoc (generated via the kotlin-as-java plugin for Dokka) can be accessed here as well.
+### Binary Releases
+Published releases are available on Maven Central.
 
-Two implementations - FastArray64 and UnsafeArray64 (planned).
+    <dependency>
+        <groupId>io.github.millibyte1</groupId>
+        <artifactId>array64</artifactId>
+        <version>1.0</version>
+    </dependency>
 
-FastArray64:
-- Supports generic and primitive arrays.
-- Internally uses a 2D array. Partially built on the functionality of [FastUtil's BigArrays module](https://fastutil.di.unimi.it/docs/it/unimi/dsi/fastutil/BigArrays.html).
-- Highly optimized for sequential access. Still relatively fast for random access.
-- In the unlikely event none of the provided functions quite suit your needs, the internal 2D array is accessible from public inline functions as part of
-  the published API. Refer to the FastUtil documentation for usage notes.
-  
-UnsafeArray64 (planned):
-- Supports only primitive arrays.
-- Optimized for random access, but slow for sequential access.
-- Stores contents in an off-heap array, meaning it is not limited by and does not contribute to the JVM heap space.
-- Directly manipulates memory through the [sun.misc.Unsafe](https://www.baeldung.com/java-unsafe) class and handles garbage
-  collection through the [java.lang.ref.Cleaner](https://docs.oracle.com/javase/9/docs/api/java/lang/ref/Cleaner.html) class.
-  
-## Important Usage and Performance Notes
-- Direct iteration over the indices of an Array64 is inefficient (especially FastArray64). 
-  Users should use either higher order extension functions like forEach/forEachInRange or iterators.
+A direct download is also available [here](https://repo1.maven.org/maven2/io/github/millibyte1/array64).
+### Build
+This project is written entirely in Kotlin and depends on both Kotlin JDK 7 and Kotlin JDK 8.
+It also depends on Apache Commons IO and FastUtil, though these dependencies may be removed in a later version.
+### License
+This project uses the MIT License. See the 'LICENSE' file in the root directory of the project.
+### Bug Reporting and Patches
+Please report any bugs you encounter on the GitHub issue tracker for this repository. Patches can be submitted as pull requests
+with a descriptive title.
+### Contributing to the Project
+If you are interested in contributing to the project, [send an email to the author](mailto:ebhall99@gmail.com?subject=[GitHub]%20Array64).
+
+## Using the Library
+### API Overview
+#### Interfaces
+The base Array64 interface extends Iterable and defines operations for copying, checking size, getting/setting (with 
+subscript operator in Kotlin), and obtaining iterators.
+
+For each primitive type X, a subinterface XArray64 extending Array64&lt;X&gt; is provided with overloaded operations
+using primitives rather than boxed types and returning type-specific iterators rather than generic ones.
+
+Resizable arrays are not included in this initial release but are planned for the next release. A ResizableArray64 subinterface of Array64
+will be provided which defines operations for resizing an array with a default fill value and for adding and removing
+elements. Subinterfaces for each primitive type will also be provided.
+
+#### Iterators
+LongIndexedIterator - a simple subinterface of java.util.Iterator which defines an operation for getting the current index.
+
+The base Array64Iterator interface extends LongIndexedIterator and defines operations for traversing in both directions and
+setting the element at the current index.
+
+For each primitive type X, a subinterface XArray64Iterator extending Array64Iterator&lt;X&gt; is provided with overloaded operations
+using primitives rather than boxed types. 
+
+#### Implementation Classes
+
+#### Higher Order Functions
+
+#### IO Utilities
+
+
+### Kotlin Examples
+### Java Examples
+### Important Performance Notes
+- Direct iteration over the indices of an Array64 is inefficient (especially FastArray64).
+  Users should use either higher order extension functions like forEach/forEachInRange or iterators (note that foreach *loops*
+  implicitly use iterators).
 - Higher order extension functions for both the Array64 interface and all concrete types are provided. The extension functions
   for concrete types are able to apply implementation-specific optimizations and should be preferred.
 - Generally speaking, the higher order extension functions for concrete types perform better than iterators.
   (A good rule of thumb is to choose higher order functions unless you need to wrap something in a run block, Runnable/Callable, etc.)
 - When using iterators for primitive arrays, use the type-specific nextX/previousX/setX (nextByte, nextChar) methods rather than
-  plain next/previous/set in order to avoid penalties from boxing primitives.
+  plain next/previous/set in order to avoid performance penalties from boxing primitives.

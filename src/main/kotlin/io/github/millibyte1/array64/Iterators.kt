@@ -18,10 +18,10 @@ interface LongIndexedIterator<out E> : Iterator<E> {
 }
 
 /**
- * An Iterator which can move in both the forward and backward directions and enables the user to set the values of elements.
+ * A LongIndexedIterator which can move in both the forward and backward directions and enables the user to set the values of elements.
  * @param E The type of element stored in this iterator.
  */
-interface ArrayIterator<E> : Iterator<E> {
+interface Array64Iterator<E> : Iterator<E>, LongIndexedIterator<E> {
     /**
      * Returns the previous element in the iteration.
      * (Note that alternating calls to [next] and [previous] will return the same element repeatedly.)
@@ -32,8 +32,8 @@ interface ArrayIterator<E> : Iterator<E> {
     /** Replaces the element at the current index (the last element returned by [next] or [previous]) with the specified element. */
     fun set(element: E)
 }
-/** An ArrayIterator for unboxed Bytes. */
-abstract class ByteArrayIterator : ByteIterator(), ArrayIterator<Byte> {
+/** An Array64Iterator for unboxed Bytes. */
+abstract class ByteArray64Iterator : ByteIterator(), Array64Iterator<Byte> {
     /** Returns the previous element in the iteration without boxing. */
     abstract fun previousByte(): Byte
     final override fun previous(): Byte = previousByte()
@@ -41,8 +41,8 @@ abstract class ByteArrayIterator : ByteIterator(), ArrayIterator<Byte> {
     abstract fun setByte(element: Byte)
     final override fun set(element: Byte) = setByte(element)
 }
-/** An ArrayIterator for unboxed Booleans. */
-abstract class BooleanArrayIterator : BooleanIterator(), ArrayIterator<Boolean> {
+/** An Array64Iterator for unboxed Booleans. */
+abstract class BooleanArray64Iterator : BooleanIterator(), Array64Iterator<Boolean> {
     /** Returns the previous element in the iteration without boxing. */
     abstract fun previousBoolean(): Boolean
     final override fun previous(): Boolean = previousBoolean()
@@ -50,8 +50,8 @@ abstract class BooleanArrayIterator : BooleanIterator(), ArrayIterator<Boolean> 
     abstract fun setBoolean(element: Boolean)
     final override fun set(element: Boolean) = setBoolean(element)
 }
-/** An ArrayIterator for unboxed Chars. */
-abstract class CharArrayIterator : CharIterator(), ArrayIterator<Char> {
+/** An Array64Iterator for unboxed Chars. */
+abstract class CharArray64Iterator : CharIterator(), Array64Iterator<Char> {
     /** Returns the previous element in the iteration without boxing. */
     abstract fun previousChar(): Char
     final override fun previous(): Char = previousChar()
@@ -59,8 +59,8 @@ abstract class CharArrayIterator : CharIterator(), ArrayIterator<Char> {
     abstract fun setChar(element: Char)
     final override fun set(element: Char) = setChar(element)
 }
-/** An ArrayIterator for unboxed Shorts. */
-abstract class ShortArrayIterator : ShortIterator(), ArrayIterator<Short> {
+/** An Array64Iterator for unboxed Shorts. */
+abstract class ShortArray64Iterator : ShortIterator(), Array64Iterator<Short> {
     /** Returns the previous element in the iteration without boxing. */
     abstract fun previousShort(): Short
     final override fun previous(): Short = previousShort()
@@ -68,8 +68,8 @@ abstract class ShortArrayIterator : ShortIterator(), ArrayIterator<Short> {
     abstract fun setShort(element: Short)
     final override fun set(element: Short) = setShort(element)
 }
-/** An ArrayIterator for unboxed Ints. */
-abstract class IntArrayIterator : IntIterator(), ArrayIterator<Int> {
+/** An Array64Iterator for unboxed Ints. */
+abstract class IntArray64Iterator : IntIterator(), Array64Iterator<Int> {
     /** Returns the previous element in the iteration without boxing. */
     abstract fun previousInt(): Int
     final override fun previous(): Int = previousInt()
@@ -77,8 +77,8 @@ abstract class IntArrayIterator : IntIterator(), ArrayIterator<Int> {
     abstract fun setInt(element: Int)
     final override fun set(element: Int) = setInt(element)
 }
-/** An ArrayIterator for unboxed Longs. */
-abstract class LongArrayIterator : LongIterator(), ArrayIterator<Long> {
+/** An Array64Iterator for unboxed Longs. */
+abstract class LongArray64Iterator : LongIterator(), Array64Iterator<Long> {
     /** Returns the previous element in the iteration without boxing. */
     abstract fun previousLong(): Long
     final override fun previous(): Long = previousLong()
@@ -86,8 +86,8 @@ abstract class LongArrayIterator : LongIterator(), ArrayIterator<Long> {
     abstract fun setLong(element: Long)
     final override fun set(element: Long) = setLong(element)
 }
-/** An ArrayIterator for unboxed Floats. */
-abstract class FloatArrayIterator : FloatIterator(), ArrayIterator<Float> {
+/** An Array64Iterator for unboxed Floats. */
+abstract class FloatArray64Iterator : FloatIterator(), Array64Iterator<Float> {
     /** Returns the previous element in the iteration without boxing. */
     abstract fun previousFloat(): Float
     final override fun previous(): Float = previousFloat()
@@ -95,8 +95,8 @@ abstract class FloatArrayIterator : FloatIterator(), ArrayIterator<Float> {
     abstract fun setFloat(element: Float)
     final override fun set(element: Float) = setFloat(element)
 }
-/** An ArrayIterator for unboxed Doubles. */
-abstract class DoubleArrayIterator : DoubleIterator(), ArrayIterator<Double> {
+/** An Array64Iterator for unboxed Doubles. */
+abstract class DoubleArray64Iterator : DoubleIterator(), Array64Iterator<Double> {
     /** Returns the previous element in the iteration without boxing. */
     abstract fun previousDouble(): Double
     final override fun previous(): Double = previousDouble()
@@ -104,25 +104,3 @@ abstract class DoubleArrayIterator : DoubleIterator(), ArrayIterator<Double> {
     abstract fun setDouble(element: Double)
     final override fun set(element: Double) = setDouble(element)
 }
-
-/**
- * An ArrayIterator indexed by a Long value.
- * @param E The type of element stored in this iterator.
- */
-interface Array64Iterator<E> : LongIndexedIterator<E>, ArrayIterator<E>
-/** A ByteArrayIterator indexed by a Long value. */
-abstract class ByteArray64Iterator : ByteArrayIterator(), Array64Iterator<Byte>
-/** A BooleanArrayIterator indexed by a Long value. */
-abstract class BooleanArray64Iterator : BooleanArrayIterator(), Array64Iterator<Boolean>
-/** A CharArrayIterator indexed by a Long value. */
-abstract class CharArray64Iterator : CharArrayIterator(), Array64Iterator<Char>
-/** A ShortArrayIterator indexed by a Long value. */
-abstract class ShortArray64Iterator : ShortArrayIterator(), Array64Iterator<Short>
-/** An IntArrayIterator indexed by a Long value. */
-abstract class IntArray64Iterator : IntArrayIterator(), Array64Iterator<Int>
-/** A LongArrayIterator indexed by a Long value. */
-abstract class LongArray64Iterator : LongArrayIterator(), Array64Iterator<Long>
-/** A FloatArrayIterator indexed by a Long value. */
-abstract class FloatArray64Iterator : FloatArrayIterator(), Array64Iterator<Float>
-/** A DoubleArrayIterator indexed by a Long value. */
-abstract class DoubleArray64Iterator : DoubleArrayIterator(), Array64Iterator<Double>

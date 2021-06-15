@@ -145,21 +145,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${version.maven-javadoc-plugin}</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
 
             <!--Signing Artifacts-->
             <plugin>
@@ -191,6 +176,7 @@
             </plugin>
 
             <!--Deploying Releases-->
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
@@ -208,6 +194,7 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            -->
         </plugins>
     </build>
 
@@ -271,7 +258,6 @@
         <version.maven-scm-provider-gitexe>1.9.5</version.maven-scm-provider-gitexe>
         <version.nexus-staging-maven-plugin>1.6.7</version.nexus-staging-maven-plugin>
         <version.maven-source-plugin>3.0.1</version.maven-source-plugin>
-        <version.maven-javadoc-plugin>3.3.0</version.maven-javadoc-plugin>
         <build.plugins.plugin.version>3.8.1</build.plugins.plugin.version>
         <dokka.version>1.4.32</dokka.version>
     </properties>

@@ -47,6 +47,7 @@ class FastArray64Test {
         var count = 0
         array.forEachInRangeIndexed(1 until TEST_SMALL_ARRAY_SIZE + 4) { _, e -> if(e == 1.toByte()) count++ }
         assertEquals(count, 2)
+        array.forEachInRange(FastByteArray64Test.TEST_SMALL_ARRAY_SIZE + 5 until FastByteArray64Test.TEST_MEDIUM_ARRAY_SIZE) { e -> assertEquals(e, 0.toByte()) }
     }
 
     @Test

@@ -118,7 +118,7 @@ private class FastArray64Iterator<E>(private val array: FastArray64<E>, index: L
         if(innerIndex == BigArrays.SEGMENT_SIZE - 1) {
             innerIndex = 0
             outerIndex++
-            inner = array.array[outerIndex]
+            if(index != array.lastIndex) inner = array.array[outerIndex]
         }
         else innerIndex++
         index++
@@ -128,7 +128,7 @@ private class FastArray64Iterator<E>(private val array: FastArray64<E>, index: L
         if(innerIndex == 0) {
             innerIndex = BigArrays.SEGMENT_SIZE - 1
             outerIndex--
-            inner = array.array[outerIndex]
+            if(index != 0L) inner = array.array[outerIndex]
         }
         else innerIndex--
         index--

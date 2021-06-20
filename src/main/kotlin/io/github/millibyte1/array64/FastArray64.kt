@@ -13,7 +13,10 @@ import it.unimi.dsi.fastutil.BigArrays
  */
 class FastArray64<E> : Array64<E> {
 
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @get:JvmName("size")
     override val size: Long
+
     @PublishedApi internal val array: Array<Array<E>>
 
     /** Creates a copy of the given Array64. */

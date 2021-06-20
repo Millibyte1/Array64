@@ -13,7 +13,10 @@ import it.unimi.dsi.fastutil.BigArrays
  */
 class FastBooleanArray64 : BooleanArray64 {
 
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @get:JvmName("size")
     override val size: Long
+
     @PublishedApi internal val array: Array<BooleanArray>
 
     /** Creates a new array of the specified [size], with all elements initialized to zero. */

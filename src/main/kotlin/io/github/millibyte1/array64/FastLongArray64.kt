@@ -13,7 +13,10 @@ import it.unimi.dsi.fastutil.BigArrays
  */
 class FastLongArray64 : LongArray64 {
 
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @get:JvmName("size")
     override val size: Long
+
     @PublishedApi internal val array: Array<LongArray>
 
     /** Creates a new array of the specified [size], with all elements initialized to zero. */

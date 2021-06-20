@@ -7,6 +7,8 @@ package io.github.millibyte1.array64
  */
 interface Array64<E> : Iterable<E> {
     /** The number of elements in this array. */
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @get:JvmName("size")
     val size: Long
     /** Produces a shallow copy of this array. */
     fun copy(): Array64<E>

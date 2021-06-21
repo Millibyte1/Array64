@@ -16,8 +16,12 @@ interface Array64<E> : Iterable<E> {
     operator fun get(index: Long): E
     /** Sets the element at the given [index] to the given [value]. This method can be called using the index operator. */
     operator fun set(index: Long, value: E)
+    /** Returns an iterator to the first element in this array. */
     override fun iterator(): Array64Iterator<E>
-    /** Returns an iterator to the element at the given [index]. */
+    /**
+     * Returns an iterator to the element at the given [index].
+     * @throws IllegalArgumentException if an invalid index is provided
+     */
     fun iterator(index: Long): Array64Iterator<E>
 }
 /** Marker interface for Array64s of unboxed primitive Bytes. */

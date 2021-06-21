@@ -1,6 +1,5 @@
 package io.github.millibyte1.array64
 
-import io.github.millibyte1.array64.FastByteArray64.Companion.MAX_SIZE
 import it.unimi.dsi.fastutil.BigArrays
 
 /**
@@ -121,19 +120,5 @@ class FastArray64<E> : Array64<E> {
             else innerIndex--
             index--
         }
-    }
-
-    companion object {
-        /**
-         * Creates a new array of the specified [size], with all elements initialized according to the given [init] function.
-         *
-         * This is a Kotlin pseudo-constructor. Reified type parameters are needed for generic 2D array creation but aren't possible
-         * with real constructors, so an inlined operator function is used to act like a constructor.
-         *
-         * @throws IllegalArgumentException if [size] is not between 1 and [MAX_SIZE]
-         */
-        @JvmStatic inline operator fun <reified E> invoke(size: Long, crossinline init: (Long) -> E): FastArray64<E> = makeTypedArray64(size, init)
-        /** The theoretical maximum number of elements that can fit in this array */
-        @JvmField val MAX_SIZE = BigArrays.SEGMENT_SIZE.toLong() * Int.MAX_VALUE
     }
 }

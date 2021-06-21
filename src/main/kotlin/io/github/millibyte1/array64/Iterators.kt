@@ -6,6 +6,7 @@ package io.github.millibyte1.array64
  *
  * It is strictly less performant to use iterators than to use the included higher order functions provided for each
  * concrete implementation type of the Array64 interface, and therefore should be avoided by external users.
+ * TODO: re-evaluate this
  */
 
 /**

@@ -1,3 +1,4 @@
+@file:JvmName("IOUtils")
 package io.github.millibyte1.array64
 
 import it.unimi.dsi.fastutil.BigArrays

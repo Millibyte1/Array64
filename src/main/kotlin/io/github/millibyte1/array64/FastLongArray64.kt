@@ -73,8 +73,7 @@ class FastLongArray64 : LongArray64 {
         if(index < 0 || index >= this.size) throw IllegalArgumentException("Invalid index provided.")
         return Iterator(this, index)
     }
-    override operator fun iterator(): LongArray64Iterator =
-        Iterator(this, 0)
+    override operator fun iterator(): LongArray64Iterator = Iterator(this, 0)
 
     override fun equals(other: Any?): Boolean {
         if(other === this) return true
@@ -136,33 +135,5 @@ class FastLongArray64 : LongArray64 {
             else innerIndex--
             index--
         }
-    }
-
-    companion object {
-        /**
-         * Creates a new array of the specified [size], with all elements initialized according to the given [init] function.
-         *
-         * This is a Kotlin pseudo-constructor. Reified type parameters are needed for generic 2D array creation but aren't possible
-         * with real constructors, so an inlined operator function is used to act like a constructor.
-         *
-         * @throws IllegalArgumentException if [size] is not between 1 and [MAX_SIZE]
-         */
-        @JvmStatic
-        inline operator fun invoke(size: Long, init: (Long) -> Long): FastLongArray64 {
-            val retval = FastLongArray64(size)
-            //initializes the elements of the array using cache-aware iteration as per FastUtil specification
-            var index = 0L
-            for(inner in retval.array) {
-                var innerIndex = 0
-                while(innerIndex < inner.size) {
-                    inner[innerIndex] = init(index)
-                    innerIndex++
-                    index++
-                }
-            }
-            return retval
-        }
-        /** The theoretical maximum number of elements that can fit in this array */
-        @JvmField val MAX_SIZE = BigArrays.SEGMENT_SIZE.toLong() * Int.MAX_VALUE
     }
 }

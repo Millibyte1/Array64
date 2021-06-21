@@ -1,6 +1,18 @@
+@file:JvmName("Arrays")
 package io.github.millibyte1.array64
 
 import it.unimi.dsi.fastutil.BigArrays
+
+// EXTENSION PROPERTIES
+
+/** Returns the last valid index for the array. */
+val Array64<*>.lastIndex: Long
+    get() = size - 1
+/** Returns the range of valid indices for the array. */
+val Array64<*>.indices: LongRange
+    get() = LongRange(0, lastIndex)
+
+// HELPERS
 
 /** Creates a generic array instance with the given size and initializer. */
 inline fun <reified E> makeTypedArray(size: Int, init: (Int) -> E): Array<E> = Array(size) { i -> init(i) }
@@ -29,12 +41,7 @@ inline fun <reified E> makeTyped2DArray(innerSizes: Array<Int>, init: (Int, Int)
     }
 }
 
-/** Returns the last valid index for the array. */
-val Array64<*>.lastIndex: Long
-    get() = size - 1
-/** Returns the range of valid indices for the array. */
-val Array64<*>.indices: LongRange
-    get() = LongRange(0, lastIndex)
+// MISC. EXTENSION FUNCTIONS
 
 /**
  * Returns true if the two specified arrays are structurally equal to one another,
@@ -50,6 +57,11 @@ infix fun <E> Array64<E>.contentEquals(other: Array64<E>): Boolean {
     while(thisIterator.hasNext()) if(thisIterator.next() != otherIterator.next()) return false
     return true
 }
+
+/** Creates a [Sequence] instance that wraps the original array returning its elements when being iterated. */
+fun <E> Array64<E>.asSequence(): Sequence<E> = Sequence { this.iterator() }
+
+// HIGHER ORDER FUNCTIONS
 
 /** Performs the given [action] on each element. */
 inline fun <E> Array64<E>.forEach(action: (E) -> Unit) {
@@ -73,10 +85,6 @@ inline fun <E> Array64<E>.forEachInRangeIndexed(range: LongRange, action: (index
     val iterator = this.iterator(range.first)
     while(iterator.index <= range.last) action(iterator.index, iterator.next())
 }
-
-/** Creates a [Sequence] instance that wraps the original array returning its elements when being iterated. */
-fun <E> Array64<E>.asSequence(): Sequence<E> = Sequence { this.iterator() }
-
 /** Returns true if all elements match the given [predicate]. */
 inline fun <E> Array64<E>.all(predicate: (E) -> Boolean): Boolean {
     this.forEach { e -> if(!predicate(e)) return false }

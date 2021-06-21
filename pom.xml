@@ -6,7 +6,7 @@
 
     <groupId>io.github.millibyte1</groupId>
     <artifactId>array64</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <packaging>jar</packaging>
 
     <name>array64</name>

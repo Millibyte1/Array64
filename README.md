@@ -16,7 +16,7 @@ Published releases are available on Maven Central.
     <dependency>
         <groupId>io.github.millibyte1</groupId>
         <artifactId>array64</artifactId>
-        <version>1.0</version>
+        <version>1.0.2</version>
     </dependency>
 
 A direct download is also available [here](https://repo1.maven.org/maven2/io/github/millibyte1/array64).

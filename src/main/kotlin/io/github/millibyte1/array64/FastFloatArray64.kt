@@ -33,6 +33,22 @@ class FastFloatArray64 : FloatArray64 {
             if(innerSize == 0) Array(fullArrays) { FloatArray(BigArrays.SEGMENT_SIZE) }
             else Array(fullArrays + 1) { i -> if(i == fullArrays) FloatArray(innerSize) else FloatArray(BigArrays.SEGMENT_SIZE) }
     }
+    /**
+     * Creates a new array of the specified [size], with all elements initialized according to the given [init] function.
+     * @throws IllegalArgumentException if [size] is not between 1 and [MAX_SIZE]
+     */
+    constructor(size: Long, init: (Long) -> Float) : this(size) {
+        //initializes the elements of the array using cache-aware iteration as per FastUtil specification
+        var index = 0L
+        for(inner in this.array) {
+            var innerIndex = 0
+            while(innerIndex < inner.size) {
+                inner[innerIndex] = init(index)
+                innerIndex++
+                index++
+            }
+        }
+    }
 
     /**
      * Creates a copy of the given array.

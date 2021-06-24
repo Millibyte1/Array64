@@ -65,37 +65,6 @@ class FastByteArray64Test {
         assertTrue(array.contentEquals(copy))
     }
 
-    @Test
-    @Order(4)
-    fun testRandomAccessTimes() {
-        val random = Random(-234013250)
-        val array = FastByteArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
-        val indices = LongArray(10000000) { random.nextLong(10000000) }
-        val time1 = measureTimeMillis {
-            for(i in indices) assertTrue(array[i] >= 0)
-        }
-        val array32 = ByteArray(TEST_MEDIUM_ARRAY_SIZE.toInt()) { i -> (i % 8).toByte() }
-        val time2 = measureTimeMillis {
-            for(i in indices) assertTrue(array32[i.toInt()] >= 0)
-        }
-        println("time1: $time1")
-        println("time2: $time2")
-    }
-    @Test
-    @Order(5)
-    fun testSequentialAccessTimes() {
-        val array = FastByteArray64(TEST_MEDIUM_ARRAY_SIZE) { i -> (i % 8).toByte() }
-        val time1 = measureTimeMillis {
-            array.forEachIndexed { i, e -> assertEquals(e, (i % 8).toByte()) }
-        }
-        val array32 = ByteArray(TEST_MEDIUM_ARRAY_SIZE.toInt()) { i -> (i % 8).toByte() }
-        val time2 = measureTimeMillis {
-            array32.forEachIndexed { i, e -> assertEquals(e, (i % 8).toByte()) }
-        }
-        println("time1: $time1")
-        println("time2: $time2")
-    }
-
     companion object {
         const val TEST_SMALL_ARRAY_SIZE = BigArrays.SEGMENT_SIZE.toLong() + 1
         const val TEST_MEDIUM_ARRAY_SIZE = BigArrays.SEGMENT_SIZE.toLong() * 2

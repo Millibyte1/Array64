@@ -70,6 +70,18 @@ class FastArray64<E> : Array64<E> {
         return true
     }
 
+    companion object {
+        /**
+         * Creates a new array of the specified [size], with all elements initialized according to the given [init] function.
+         *
+         * This is a Kotlin pseudo-constructor. Reified type parameters are needed for generic 2D array creation but aren't possible
+         * with real constructors, so an inlined operator function is used to act like a constructor.
+         *
+         * @throws IllegalArgumentException if [size] is not between 1 and [MAX_SIZE]
+         */
+        @JvmStatic @JvmName("create")
+        inline operator fun <reified E> invoke(size: Long, crossinline init: (Long) -> E): FastArray64<E> = makeTypedFastArray64(size, init)
+    }
     /**
      * A simple efficient bidirectional iterator for the FastArray64 class.
      * @param E the type of element stored in the array

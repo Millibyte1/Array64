@@ -17,20 +17,12 @@ interface Array64<E> : Iterable<E> {
     /** Sets the element at the given [index] to the given [value]. This method can be called using the index operator. */
     operator fun set(index: Long, value: E)
     /** Returns an iterator to the first element in this array. */
-    override fun iterator(): Array64Iterator<E>
+    override operator fun iterator(): Array64Iterator<E>
     /**
      * Returns an iterator to the element at the given [index].
      * @throws IllegalArgumentException if an invalid index is provided
      */
     fun iterator(index: Long): Array64Iterator<E>
-}
-/** Marker interface for Array64s of unboxed primitive Bytes. */
-interface ByteArray64 : Array64<Byte> {
-    override fun copy(): ByteArray64
-    override operator fun get(index: Long): Byte
-    override operator fun set(index: Long, value: Byte)
-    override operator fun iterator(): ByteArray64Iterator
-    override fun iterator(index: Long): ByteArray64Iterator
 }
 /** Marker interface for Array64s of unboxed primitive Booleans. */
 interface BooleanArray64 : Array64<Boolean> {
@@ -40,6 +32,14 @@ interface BooleanArray64 : Array64<Boolean> {
     override operator fun iterator(): BooleanArray64Iterator
     override fun iterator(index: Long): BooleanArray64Iterator
 }
+/** Marker interface for Array64s of unboxed primitive Bytes. */
+interface ByteArray64 : Array64<Byte> {
+    override fun copy(): ByteArray64
+    override operator fun get(index: Long): Byte
+    override operator fun set(index: Long, value: Byte)
+    override operator fun iterator(): ByteArray64Iterator
+    override fun iterator(index: Long): ByteArray64Iterator
+}
 /** Marker interface for Array64s of unboxed primitive Chars. */
 interface CharArray64 : Array64<Char> {
     override fun copy(): CharArray64
@@ -47,6 +47,22 @@ interface CharArray64 : Array64<Char> {
     override operator fun set(index: Long, value: Char)
     override operator fun iterator(): CharArray64Iterator
     override fun iterator(index: Long): CharArray64Iterator
+}
+/** Marker interface for Array64s of unboxed primitive Doubles. */
+interface DoubleArray64 : Array64<Double> {
+    override fun copy(): DoubleArray64
+    override operator fun get(index: Long): Double
+    override operator fun set(index: Long, value: Double)
+    override operator fun iterator(): DoubleArray64Iterator
+    override fun iterator(index: Long): DoubleArray64Iterator
+}
+/** Marker interface for Array64s of unboxed primitive Floats. */
+interface FloatArray64 : Array64<Float> {
+    override fun copy(): FloatArray64
+    override operator fun get(index: Long): Float
+    override operator fun set(index: Long, value: Float)
+    override operator fun iterator(): FloatArray64Iterator
+    override fun iterator(index: Long): FloatArray64Iterator
 }
 /** Marker interface for Array64s of unboxed primitive Shorts. */
 interface ShortArray64 : Array64<Short> {
@@ -71,20 +87,4 @@ interface LongArray64 : Array64<Long> {
     override operator fun set(index: Long, value: Long)
     override operator fun iterator(): LongArray64Iterator
     override fun iterator(index: Long): LongArray64Iterator
-}
-/** Marker interface for Array64s of unboxed primitive Floats. */
-interface FloatArray64 : Array64<Float> {
-    override fun copy(): FloatArray64
-    override operator fun get(index: Long): Float
-    override operator fun set(index: Long, value: Float)
-    override operator fun iterator(): FloatArray64Iterator
-    override fun iterator(index: Long): FloatArray64Iterator
-}
-/** Marker interface for Array64s of unboxed primitive Doubles. */
-interface DoubleArray64 : Array64<Double> {
-    override fun copy(): DoubleArray64
-    override operator fun get(index: Long): Double
-    override operator fun set(index: Long, value: Double)
-    override operator fun iterator(): DoubleArray64Iterator
-    override fun iterator(index: Long): DoubleArray64Iterator
 }

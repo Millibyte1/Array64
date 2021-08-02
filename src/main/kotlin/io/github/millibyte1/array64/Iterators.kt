@@ -33,15 +33,6 @@ interface Array64Iterator<E> : Iterator<E>, LongIndexedIterator<E> {
     /** Replaces the element at the current index (the last element returned by [next] or [previous]) with the specified element. */
     fun set(element: E)
 }
-/** An Array64Iterator for unboxed Bytes. */
-abstract class ByteArray64Iterator : ByteIterator(), Array64Iterator<Byte> {
-    /** Returns the previous element in the iteration without boxing. */
-    abstract fun previousByte(): Byte
-    final override fun previous(): Byte = previousByte()
-    /** Replaces the element at the current index with the specified primitive. */
-    abstract fun setByte(element: Byte)
-    final override fun set(element: Byte) = setByte(element)
-}
 /** An Array64Iterator for unboxed Booleans. */
 abstract class BooleanArray64Iterator : BooleanIterator(), Array64Iterator<Boolean> {
     /** Returns the previous element in the iteration without boxing. */
@@ -51,6 +42,15 @@ abstract class BooleanArray64Iterator : BooleanIterator(), Array64Iterator<Boole
     abstract fun setBoolean(element: Boolean)
     final override fun set(element: Boolean) = setBoolean(element)
 }
+/** An Array64Iterator for unboxed Bytes. */
+abstract class ByteArray64Iterator : ByteIterator(), Array64Iterator<Byte> {
+    /** Returns the previous element in the iteration without boxing. */
+    abstract fun previousByte(): Byte
+    final override fun previous(): Byte = previousByte()
+    /** Replaces the element at the current index with the specified primitive. */
+    abstract fun setByte(element: Byte)
+    final override fun set(element: Byte) = setByte(element)
+}
 /** An Array64Iterator for unboxed Chars. */
 abstract class CharArray64Iterator : CharIterator(), Array64Iterator<Char> {
     /** Returns the previous element in the iteration without boxing. */
@@ -59,6 +59,24 @@ abstract class CharArray64Iterator : CharIterator(), Array64Iterator<Char> {
     /** Replaces the element at the current index with the specified primitive. */
     abstract fun setChar(element: Char)
     final override fun set(element: Char) = setChar(element)
+}
+/** An Array64Iterator for unboxed Doubles. */
+abstract class DoubleArray64Iterator : DoubleIterator(), Array64Iterator<Double> {
+    /** Returns the previous element in the iteration without boxing. */
+    abstract fun previousDouble(): Double
+    final override fun previous(): Double = previousDouble()
+    /** Replaces the element at the current index with the specified primitive. */
+    abstract fun setDouble(element: Double)
+    final override fun set(element: Double) = setDouble(element)
+}
+/** An Array64Iterator for unboxed Floats. */
+abstract class FloatArray64Iterator : FloatIterator(), Array64Iterator<Float> {
+    /** Returns the previous element in the iteration without boxing. */
+    abstract fun previousFloat(): Float
+    final override fun previous(): Float = previousFloat()
+    /** Replaces the element at the current index with the specified primitive. */
+    abstract fun setFloat(element: Float)
+    final override fun set(element: Float) = setFloat(element)
 }
 /** An Array64Iterator for unboxed Shorts. */
 abstract class ShortArray64Iterator : ShortIterator(), Array64Iterator<Short> {
@@ -86,22 +104,4 @@ abstract class LongArray64Iterator : LongIterator(), Array64Iterator<Long> {
     /** Replaces the element at the current index with the specified primitive. */
     abstract fun setLong(element: Long)
     final override fun set(element: Long) = setLong(element)
-}
-/** An Array64Iterator for unboxed Floats. */
-abstract class FloatArray64Iterator : FloatIterator(), Array64Iterator<Float> {
-    /** Returns the previous element in the iteration without boxing. */
-    abstract fun previousFloat(): Float
-    final override fun previous(): Float = previousFloat()
-    /** Replaces the element at the current index with the specified primitive. */
-    abstract fun setFloat(element: Float)
-    final override fun set(element: Float) = setFloat(element)
-}
-/** An Array64Iterator for unboxed Doubles. */
-abstract class DoubleArray64Iterator : DoubleIterator(), Array64Iterator<Double> {
-    /** Returns the previous element in the iteration without boxing. */
-    abstract fun previousDouble(): Double
-    final override fun previous(): Double = previousDouble()
-    /** Replaces the element at the current index with the specified primitive. */
-    abstract fun setDouble(element: Double)
-    final override fun set(element: Double) = setDouble(element)
 }

@@ -9,7 +9,7 @@ import it.unimi.dsi.fastutil.BigArrays
  *
  * @param E The type of element stored in this array.
  */
-class FastArray64<E> : Array64<E> {
+open class FastArray64<E> : Array64<E> {
 
     /** The number of elements in this array. */
     @Suppress("INAPPLICABLE_JVM_NAME")

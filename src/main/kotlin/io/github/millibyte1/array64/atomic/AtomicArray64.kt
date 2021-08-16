@@ -67,6 +67,7 @@ interface AtomicArray64<E> : Array64<E> {
     fun compareAndSet(index: Long, new: E, predicate: (old: E, new: E) -> Boolean): Boolean
     /**
      * Eventually sets the element at the given [index] to the given [value].
+     * Depending on the implementation, may immediately perform a volatile write.
      * @param index the index of the element to set
      * @param value the value to set the element to
      * @throws NoSuchElementException if the index is out of bounds

@@ -54,6 +54,7 @@ interface AtomicArray64Iterator<E> : Array64Iterator<E> {
     fun compareAndSet(new: E, predicate: (old: E, new: E) -> Boolean): Boolean
     /**
      * Eventually sets the element at the given [index] to the given [value].
+     * Depending on the implementation, may immediately perform a volatile write. 
      * @param value the value to set the element to
      */
     fun lazySet(value: E)
@@ -101,6 +102,7 @@ abstract class AtomicBooleanArray64Iterator : BooleanArray64Iterator(), AtomicAr
     abstract fun compareAndSetBoolean(new: Boolean, predicate: (old: Boolean, new: Boolean) -> Boolean): Boolean
     /**
      * Eventually sets the element at the given [index] to the given [value].
+     * Depending on the implementation, may immediately perform a volatile write.
      * @param value the value to set the element to
      */
     abstract fun lazySetBoolean(value: Boolean)
@@ -154,6 +156,7 @@ abstract class AtomicByteArray64Iterator : ByteArray64Iterator(), AtomicArray64I
     abstract fun compareAndSetByte(new: Byte, predicate: (old: Byte, new: Byte) -> Boolean): Boolean
     /**
      * Eventually sets the element at the given [index] to the given [value].
+     * Depending on the implementation, may immediately perform a volatile write.
      * @param value the value to set the element to
      */
     abstract fun lazySetByte(value: Byte)
@@ -207,6 +210,7 @@ abstract class AtomicCharArray64Iterator : CharArray64Iterator(), AtomicArray64I
     abstract fun compareAndSetChar(new: Char, predicate: (old: Char, new: Char) -> Boolean): Boolean
     /**
      * Eventually sets the element at the given [index] to the given [value].
+     * Depending on the implementation, may immediately perform a volatile write.
      * @param value the value to set the element to
      */
     abstract fun lazySetChar(value: Char)
@@ -260,6 +264,7 @@ abstract class AtomicDoubleArray64Iterator : DoubleArray64Iterator(), AtomicArra
     abstract fun compareAndSetDouble(new: Double, predicate: (old: Double, new: Double) -> Boolean): Boolean
     /**
      * Eventually sets the element at the given [index] to the given [value].
+     * Depending on the implementation, may immediately perform a volatile write.
      * @param value the value to set the element to
      */
     abstract fun lazySetDouble(value: Double)
@@ -313,6 +318,7 @@ abstract class AtomicFloatArray64Iterator : FloatArray64Iterator(), AtomicArray6
     abstract fun compareAndSetFloat(new: Float, predicate: (old: Float, new: Float) -> Boolean): Boolean
     /**
      * Eventually sets the element at the given [index] to the given [value].
+     * Depending on the implementation, may immediately perform a volatile write.
      * @param value the value to set the element to
      */
     abstract fun lazySetFloat(value: Float)
@@ -366,6 +372,7 @@ abstract class AtomicIntArray64Iterator : IntArray64Iterator(), AtomicArray64Ite
     abstract fun compareAndSetInt(new: Int, predicate: (old: Int, new: Int) -> Boolean): Boolean
     /**
      * Eventually sets the element at the given [index] to the given [value].
+     * Depending on the implementation, may immediately perform a volatile write.
      * @param value the value to set the element to
      */
     abstract fun lazySetInt(value: Int)
@@ -419,6 +426,7 @@ abstract class AtomicLongArray64Iterator : LongArray64Iterator(), AtomicArray64I
     abstract fun compareAndSetLong(new: Long, predicate: (old: Long, new: Long) -> Boolean): Boolean
     /**
      * Eventually sets the element at the given [index] to the given [value].
+     * Depending on the implementation, may immediately perform a volatile write.
      * @param value the value to set the element to
      */
     abstract fun lazySetLong(value: Long)
@@ -472,6 +480,7 @@ abstract class AtomicShortArray64Iterator : ShortArray64Iterator(), AtomicArray6
     abstract fun compareAndSetShort(new: Short, predicate: (old: Short, new: Short) -> Boolean): Boolean
     /**
      * Eventually sets the element at the given [index] to the given [value].
+     * Depending on the implementation, may immediately perform a volatile write.
      * @param value the value to set the element to
      */
     abstract fun lazySetShort(value: Short)

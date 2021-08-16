@@ -8,7 +8,7 @@ import it.unimi.dsi.fastutil.BigArrays
  * Internally uses a 2D array and the FastUtil [BigArrays] library.
  *
  */
-class FastLongArray64 : LongArray64 {
+open class FastLongArray64 : LongArray64 {
 
     /** The number of elements in this array. */
     @Suppress("INAPPLICABLE_JVM_NAME")

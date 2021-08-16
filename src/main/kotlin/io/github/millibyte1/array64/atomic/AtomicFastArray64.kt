@@ -1,6 +1,7 @@
 package io.github.millibyte1.array64.atomic
 
 import io.github.millibyte1.array64.*
+import io.github.millibyte1.array64.util.byteOffset
 import it.unimi.dsi.fastutil.BigArrays
 import io.github.millibyte1.array64.util.unsafe
 import io.github.millibyte1.array64.util.getArrayBaseOffset
@@ -19,12 +20,6 @@ class AtomicFastArray64<E>
     copy: Boolean = true,
 ) : FastArray64<E>(array, copy), AtomicArray64<E> {
 
-    /**
-     * Returns the element at the given [index]. Volatile.
-     * @param index the index of the desired element
-     * @return the element at [index]
-     * @throws NoSuchElementException if the index is out of bounds
-     */
     @Suppress("UNCHECKED_CAST")
     override operator fun get(index: Long): E {
         if(index >= this.size || index < 0) throw NoSuchElementException()
@@ -33,12 +28,7 @@ class AtomicFastArray64<E>
         val offset = byteOffset(innerIndex, shift, base)
         return unsafe.getObjectVolatile(inner, offset) as E
     }
-    /**
-     * Sets the element at the given [index] to the given [value]. Volatile.
-     * @param index the index of the element to set
-     * @param value the value to set the element to
-     * @throws NoSuchElementException if the index is out of bounds
-     */
+
     override operator fun set(index: Long, value: E) {
         if(index >= this.size || index < 0) throw NoSuchElementException()
         val inner = this.array[BigArrays.segment(index)]
@@ -47,13 +37,6 @@ class AtomicFastArray64<E>
         unsafe.putObjectVolatile(inner, offset, value)
     }
 
-    /**
-     * Sets the element at position [index] to the given [new] value and returns the old value. Atomic.
-     * @param index the index of the element to set
-     * @param new the value to set the element to
-     * @return the old value of the element
-     * @throws NoSuchElementException if the index is out of bounds
-     */
     @Suppress("UNCHECKED_CAST")
     override fun getAndSet(index: Long, new: E): E {
         if(index >= this.size || index < 0) throw NoSuchElementException()
@@ -62,13 +45,7 @@ class AtomicFastArray64<E>
         val offset = byteOffset(innerIndex, shift, base)
         return unsafe.getAndSetObject(inner, offset, new) as E
     }
-    /**
-     * Sets the element at position [index] to the value resulting from applying the given [transform] to the old value. Atomic.
-     * @param index the index of the element to set
-     * @param transform the pure (side effect-free) transform function to apply to the old value
-     * @return the old value of the element
-     * @throws NoSuchElementException if the index is out of bounds
-     */
+
     @Suppress("UNCHECKED_CAST")
     override fun getAndSet(index: Long, transform: (E) -> E): E {
         if(index >= this.size || index < 0) throw NoSuchElementException()
@@ -83,13 +60,7 @@ class AtomicFastArray64<E>
         while(!unsafe.compareAndSwapObject(inner, offset, old, new))
         return old
     }
-    /**
-     * Sets the element at position [index] to the resulting value from applying the given [transform] to the old value. Atomic.
-     * @param index the index of the element to set
-     * @param transform the pure (side effect-free) transform function to apply to the old value
-     * @return the new value of the element
-     * @throws NoSuchElementException if the index is out of bounds
-     */
+
     @Suppress("UNCHECKED_CAST")
     override fun setAndGet(index: Long, transform: (E) -> E): E {
         if(index >= this.size || index < 0) throw NoSuchElementException()
@@ -105,14 +76,6 @@ class AtomicFastArray64<E>
         return new
     }
 
-    /**
-     * Sets the element at position [index] to the given [new] value if the current value matches [expected]. Atomic.
-     * @param index the index of the element to try and set
-     * @param new the value to set the element to
-     * @param expected the expected value of the element
-     * @return true if the element was able to be updated, otherwise false
-     * @throws NoSuchElementException if the index is out of bounds
-     */
     override fun compareAndSet(index: Long, new: E, expected: E): Boolean {
         if(index >= this.size || index < 0) throw NoSuchElementException()
         val inner = this.array[BigArrays.segment(index)]
@@ -120,15 +83,7 @@ class AtomicFastArray64<E>
         val offset = byteOffset(innerIndex, shift, base)
         return unsafe.compareAndSwapObject(inner, offset, expected, new)
     }
-    /**
-     * Sets the element at position [index] to the given [new] value if the provided [predicate] returns true when
-     * applied to the old and new values.
-     * @param index the index of the element to try and set
-     * @param new the value to set the element to
-     * @param predicate the binary predicate to apply to the old and new values to decide whether to update
-     * @return true if the element was able to be updated, otherwise false
-     * @throws NoSuchElementException if the index is out of bounds
-     */
+
     @Suppress("UNCHECKED_CAST")
     override fun compareAndSet(index: Long, new: E, predicate: (old: E, new: E) -> Boolean): Boolean {
         if(index >= this.size || index < 0) throw NoSuchElementException()
@@ -139,12 +94,6 @@ class AtomicFastArray64<E>
         return if(predicate(old, new)) unsafe.compareAndSwapObject(inner, offset, old, new) else false
     }
 
-    /**
-     * Eventually sets the element at the given [index] to the given [value].
-     * @param index the index of the element to set
-     * @param value the value to set the element to
-     * @throws NoSuchElementException if the index is out of bounds
-     */
     override fun lazySet(index: Long, value: E) {
         if(index >= this.size || index < 0) throw NoSuchElementException()
         val inner = this.array[BigArrays.segment(index)]
@@ -171,7 +120,7 @@ class AtomicFastArray64<E>
         inline operator fun <reified E> invoke(size: Long, crossinline init: (Long) -> E): AtomicFastArray64<E> {
             val instance = init(0)
             val scale = getArrayIndexScale(instance)
-            if(scale and (scale - 1) != 0) throw Error("data type scale not a power of two") // copied logic from AtomicReferenceArray
+            if(scale and (scale - 1) != 0) throw Error("data type scale not a power of two")
             val shift = 31 - Integer.numberOfLeadingZeros(scale)
             return AtomicFastArray64(getArrayBaseOffset(instance), shift, makeTyped2DArray(size, init))
         }
@@ -192,7 +141,7 @@ class AtomicFastArray64<E>
         inline operator fun <reified E> invoke(array: Array<Array<E>>, copy: Boolean = true): AtomicFastArray64<E> {
             val instance = array[0][0]
             val scale = getArrayIndexScale(instance)
-            if(scale and (scale - 1) != 0) throw Error("data type scale not a power of two") // copied logic from AtomicReferenceArray
+            if(scale and (scale - 1) != 0) throw Error("data type scale not a power of two")
             val shift = 31 - Integer.numberOfLeadingZeros(scale)
             return AtomicFastArray64(getArrayBaseOffset(instance), shift, array, copy)
         }
@@ -206,7 +155,7 @@ class AtomicFastArray64<E>
         inline operator fun <reified E> invoke(array: Array<E>, copy: Boolean = true): AtomicFastArray64<E> {
             val instance = array[0]
             val scale = getArrayIndexScale(instance)
-            if(scale and (scale - 1) != 0) throw Error("data type scale not a power of two") // copied logic from AtomicReferenceArray
+            if(scale and (scale - 1) != 0) throw Error("data type scale not a power of two")
             val shift = 31 - Integer.numberOfLeadingZeros(scale)
             val fastArray = if(copy) BigArrays.wrap(array) else Array(1) { array }
             return AtomicFastArray64(getArrayBaseOffset(instance), shift, fastArray, copy)
@@ -214,11 +163,13 @@ class AtomicFastArray64<E>
     }
 
     /**
-     * A bidirectional iterator supporting atomic operations on the element at its position..
+     * A bidirectional iterator supporting atomic operations on the element at its position.
      * @param E the type of element stored in the array
      * @constructor Constructs an iterator to the given [index] in the given [array].
      * @param array the array to iterate over
      * @param index the index to start at
+     * @param base the base offset of this array type
+     * @param shift the amount to shift the index to calculate the offset of an element of this array type
      */
     private class Iterator<E>(
         private val array: AtomicFastArray64<E>,
@@ -304,6 +255,3 @@ class AtomicFastArray64<E>
         override fun lazySet(value: E) = unsafe.putOrderedObject(inner, offset, value)
     }
 }
-
-/** Returns the byte offset of the element at innerIndex within any inner array. */
-private fun byteOffset(innerIndex: Int, shift: Int, base: Int): Long = (innerIndex.toLong() shl shift) + base

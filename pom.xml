@@ -6,7 +6,7 @@
 
     <groupId>io.github.millibyte1</groupId>
     <artifactId>array64</artifactId>
-    <version>1.0.2</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <name>array64</name>
@@ -228,7 +228,7 @@
         <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
 
         <!--Dependency Versions-->
-        <kotlin.version>1.4.32</kotlin.version>
+        <kotlin.version>1.5.10</kotlin.version>
         <junit.version>5.6.0</junit.version>
         <fastutil.version>8.5.2</fastutil.version>
         <commons-io.version>2.6</commons-io.version>

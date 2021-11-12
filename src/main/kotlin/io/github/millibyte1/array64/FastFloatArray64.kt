@@ -22,6 +22,7 @@ open class FastFloatArray64 : FloatArray64 {
      * Creates a new array of the specified [size], with all elements initialized to zero.
      * @throws IllegalArgumentException if [size] is not between 1 and [MAX_SIZE]
      */
+    @Suppress("LeakingThis")
     constructor(size: Long) {
         if(size > MAX_SIZE || size <= 0) throw IllegalArgumentException("Invalid size provided.")
         this.size = size
@@ -29,10 +30,12 @@ open class FastFloatArray64 : FloatArray64 {
         val fullArrays = (size / BigArrays.SEGMENT_SIZE).toInt()
         val innerSize = (size % BigArrays.SEGMENT_SIZE).toInt()
         //allocates the array
-        array =
-            if(innerSize == 0) Array(fullArrays) { FloatArray(BigArrays.SEGMENT_SIZE) }
-            else Array(fullArrays + 1) { i -> if(i == fullArrays) FloatArray(innerSize) else FloatArray(BigArrays.SEGMENT_SIZE) }
+        array = (
+                if(innerSize == 0) Array(fullArrays) { FloatArray(BigArrays.SEGMENT_SIZE) }
+                else Array(fullArrays + 1) { i -> if(i == fullArrays) FloatArray(innerSize) else FloatArray(BigArrays.SEGMENT_SIZE) }
+                )
     }
+
     /**
      * Creates a new array of the specified [size], with all elements initialized according to the given [init] function.
      * @throws IllegalArgumentException if [size] is not between 1 and [MAX_SIZE]
@@ -55,21 +58,33 @@ open class FastFloatArray64 : FloatArray64 {
      * @param array the array in question
      */
     constructor(array: FastFloatArray64) : this(array.array)
+
     /**
      * Creates a new array from the given FastUtil BigArray, either by copying its contents or simply wrapping it.
      * @param array the array in question
      * @param copy whether to copy (true) the array or directly use it as the internal array (false)
+     * @throws IllegalArgumentException if [copy] is set to false and [array] contains any inner array larger than BigArrays.SEGMENT_SIZE
      */
+    @Suppress("LeakingThis")
+    @JvmOverloads
     constructor(array: Array<FloatArray>, copy: Boolean = true) {
+        if(!copy && array.any { inner -> inner.size > BigArrays.SEGMENT_SIZE }) {
+            throw IllegalArgumentException("At least one inner array is larger than BigArrays.SEGMENT_SIZE, cannot wrap without copying")
+        }
         this.size = BigArrays.length(array)
         this.array = if(copy) BigArrays.copy(array) else array
     }
+
     /**
      * Creates a new array from the given standard library array, either by copying its contents or simply wrapping it.
      * @param array the array in question
      * @param copy whether to copy (true) the array or directly use it as the internal array (false)
+     * @throws IllegalArgumentException if [copy] is set to false and an [array] is larger than BigArrays.SEGMENT_SIZE
      */
+    @Suppress("LeakingThis")
+    @JvmOverloads
     constructor(array: FloatArray, copy: Boolean = true) {
+        if(array.size > BigArrays.SEGMENT_SIZE && !copy) throw IllegalArgumentException("Given array larger than BigArrays.SEGMENT_SIZE, cannot wrap without copying")
         this.size = array.size.toLong()
         this.array = if(copy) BigArrays.wrap(array) else Array(1) { array }
     }
@@ -80,6 +95,7 @@ open class FastFloatArray64 : FloatArray64 {
         if(index >= this.size || index < 0) throw NoSuchElementException()
         return BigArrays.get(array, index)
     }
+
     override operator fun set(index: Long, value: Float) {
         if(index >= this.size || index < 0) throw NoSuchElementException()
         BigArrays.set(array, index, value)
@@ -89,6 +105,7 @@ open class FastFloatArray64 : FloatArray64 {
         if(index < 0 || index >= this.size) throw IllegalArgumentException("Invalid index provided.")
         return Iterator(this, index)
     }
+
     override operator fun iterator(): FloatArray64Iterator = Iterator(this, 0)
 
     override fun equals(other: Any?): Boolean {
@@ -100,6 +117,8 @@ open class FastFloatArray64 : FloatArray64 {
         while(thisIterator.hasNext()) if(thisIterator.nextFloat() != otherIterator.nextFloat()) return false
         return true
     }
+
+    override fun hashCode(): Int = array.contentDeepHashCode()
 
     /**
      * A simple efficient bidirectional iterator for the FastFloatArray64 class.

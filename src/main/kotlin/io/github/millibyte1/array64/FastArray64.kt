@@ -24,23 +24,20 @@ open class FastArray64<E> : Array64<E> {
      * @param array the array in question
      */
     constructor(array: FastArray64<E>) : this(array.array)
+
     /**
      * Creates a new array from the given FastUtil BigArray, either by copying its contents or simply wrapping it.
      * @param array the array in question
      * @param copy whether to copy (true) the array or directly use it as the internal array (false)
      */
+    @Suppress("LeakingThis")
+    @JvmOverloads
     constructor(array: Array<Array<E>>, copy: Boolean = true) {
+        if(!copy && array.any { inner -> inner.size > BigArrays.SEGMENT_SIZE }) {
+            throw IllegalArgumentException("At least one inner array is larger than BigArrays.SEGMENT_SIZE, cannot wrap without copying")
+        }
         this.size = BigArrays.length(array)
         this.array = if(copy) BigArrays.copy(array) else array
-    }
-    /**
-     * Creates a new array from the given standard library array, either by copying its contents or simply wrapping it.
-     * @param array the array in question
-     * @param copy whether to copy (true) the array or directly use it as the internal array (false)
-     */
-    constructor(array: Array<E>, copy: Boolean = true) {
-        this.size = array.size.toLong()
-        this.array = if(copy) BigArrays.wrap(array) else Array(1) { array }
     }
 
     override fun copy(): FastArray64<E> = FastArray64(this)
@@ -49,6 +46,7 @@ open class FastArray64<E> : Array64<E> {
         if(index >= this.size || index < 0) throw NoSuchElementException()
         return BigArrays.get(array, index)
     }
+
     override operator fun set(index: Long, value: E) {
         if(index >= this.size || index < 0) throw NoSuchElementException()
         BigArrays.set(array, index, value)
@@ -58,6 +56,7 @@ open class FastArray64<E> : Array64<E> {
         if(index < 0 || index >= this.size) throw IllegalArgumentException("Invalid index provided.")
         return Iterator(this, index)
     }
+
     override operator fun iterator(): Array64Iterator<E> = Iterator(this, 0)
 
     override fun equals(other: Any?): Boolean {
@@ -70,18 +69,27 @@ open class FastArray64<E> : Array64<E> {
         return true
     }
 
+    override fun hashCode(): Int = array.contentDeepHashCode()
+
     companion object {
         /**
          * Creates a new array of the specified [size], with all elements initialized according to the given [init] function.
-         *
-         * This is a Kotlin pseudo-constructor. Reified type parameters are needed for generic 2D array creation but aren't possible
-         * with real constructors, so an inlined operator function is used to act like a constructor.
-         *
          * @throws IllegalArgumentException if [size] is not between 1 and [MAX_SIZE]
+         * @return the created array
          */
         @JvmStatic @JvmName("create")
         inline operator fun <reified E> invoke(size: Long, crossinline init: (Long) -> E): FastArray64<E> = makeTypedFastArray64(size, init)
+
+        /**
+         * Creates a new array from the standard library array, either by copying its contents or simply wrapping it.
+         * @param array the array in question
+         * @param copy whether to copy (true) the array or directly use it as the internal array (false)
+         * @throws IllegalArgumentException if [copy] is set to false and [array] is larger than BigArrays.SEGMENT_SIZE
+         */
+        @JvmStatic @JvmName("Create") @JvmOverloads
+        inline operator fun <reified E> invoke(array: Array<E>, copy: Boolean = true) = FastArray64(Array(1) { array }, copy)
     }
+
     /**
      * A simple efficient bidirectional iterator for the FastArray64 class.
      * @param E the type of element stored in the array

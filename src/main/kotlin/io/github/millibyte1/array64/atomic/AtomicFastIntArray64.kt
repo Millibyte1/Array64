@@ -36,12 +36,13 @@ class AtomicFastIntArray64 : FastIntArray64, AtomicArray64<Int> {
      * Creates a new array from the given FastUtil BigArray, either by copying its contents or simply wrapping it.
      * @param array the array in question
      * @param copy whether to copy (true) the array or directly use it as the internal array (false)
+     * @throws IllegalArgumentException if [copy] is set to true and an [array] is larger than BigArrays.SEGMENT_SIZE
      */
+    @JvmOverloads
     constructor(array: Array<IntArray>, copy: Boolean = true) : super(array, copy)
 
     override fun copy(): AtomicFastIntArray64 = AtomicFastIntArray64(this)
 
-    
     override operator fun get(index: Long): Int {
         if(index >= this.size || index < 0) throw NoSuchElementException()
         val inner = this.array[BigArrays.segment(index)]
@@ -57,7 +58,6 @@ class AtomicFastIntArray64 : FastIntArray64, AtomicArray64<Int> {
         val offset = byteOffset(innerIndex, shift, base)
         unsafe.putIntVolatile(inner, offset, value)
     }
-
     
     override fun getAndSet(index: Long, new: Int): Int {
         if(index >= this.size || index < 0) throw NoSuchElementException()
@@ -66,7 +66,6 @@ class AtomicFastIntArray64 : FastIntArray64, AtomicArray64<Int> {
         val offset = byteOffset(innerIndex, shift, base)
         return unsafe.getAndSetInt(inner, offset, new) 
     }
-
     
     override fun getAndSet(index: Long, transform: (Int) -> Int): Int {
         if(index >= this.size || index < 0) throw NoSuchElementException()
@@ -81,7 +80,6 @@ class AtomicFastIntArray64 : FastIntArray64, AtomicArray64<Int> {
         while(!unsafe.compareAndSwapInt(inner, offset, old, new))
         return old
     }
-
     
     override fun setAndGet(index: Long, transform: (Int) -> Int): Int {
         if(index >= this.size || index < 0) throw NoSuchElementException()
@@ -105,7 +103,6 @@ class AtomicFastIntArray64 : FastIntArray64, AtomicArray64<Int> {
         return unsafe.compareAndSwapInt(inner, offset, expected, new)
     }
 
-    
     override fun compareAndSet(index: Long, new: Int, predicate: (old: Int, new: Int) -> Boolean): Boolean {
         if(index >= this.size || index < 0) throw NoSuchElementException()
         val inner = this.array[BigArrays.segment(index)]

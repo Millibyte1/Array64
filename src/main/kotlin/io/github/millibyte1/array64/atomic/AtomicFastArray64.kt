@@ -11,6 +11,8 @@ import io.github.millibyte1.array64.util.getArrayIndexScale
  * An extension of the FastArray64 class supporting atomic operations such as compareAndSet.
  * Loosely based off the Jetbrains JDK implementation of AtomicReferenceArray.
  * @param E The type of element stored in this array.
+ * @constructor Creates a new array from the given FastUtil BigArray, either by copying its contents or simply wrapping it.
+ * Manually sets the base and shift values to use when inter
  */
 class AtomicFastArray64<E>
 @PublishedApi internal constructor(
@@ -106,6 +108,7 @@ class AtomicFastArray64<E>
         if(index < 0 || index >= this.size) throw IllegalArgumentException("Invalid index provided.")
         return Iterator(this, index, base, shift)
     }
+
     override operator fun iterator(): AtomicArray64Iterator<E> = Iterator(this, 0, base, shift)
 
     companion object {
@@ -124,6 +127,7 @@ class AtomicFastArray64<E>
             val shift = 31 - Integer.numberOfLeadingZeros(scale)
             return AtomicFastArray64(getArrayBaseOffset(instance), shift, makeTyped2DArray(size, init))
         }
+
         /**
          * Creates a copy of the given array.
          * @param array the array in question
@@ -131,13 +135,14 @@ class AtomicFastArray64<E>
          */
         @JvmStatic @JvmName("create")
         inline operator fun <reified E> invoke(array: FastArray64<E>) = AtomicFastArray64(array.array)
+
         /**
          * Creates a new array from the given FastUtil BigArray, either by copying its contents or simply wrapping it.
          * @param array the array in question
          * @param copy whether to copy (true) the array or directly use it as the internal array (false)
          * @return the created array
          */
-        @JvmStatic @JvmName("create")
+        @JvmStatic @JvmName("create") @JvmOverloads
         inline operator fun <reified E> invoke(array: Array<Array<E>>, copy: Boolean = true): AtomicFastArray64<E> {
             val instance = array[0][0]
             val scale = getArrayIndexScale(instance)
@@ -145,13 +150,14 @@ class AtomicFastArray64<E>
             val shift = 31 - Integer.numberOfLeadingZeros(scale)
             return AtomicFastArray64(getArrayBaseOffset(instance), shift, array, copy)
         }
+
         /**
          * Creates a new array from the given standard library array, either by copying its contents or simply wrapping it.
          * @param array the array in question
          * @param copy whether to copy (true) the array or directly use it as the internal array (false)
          * @return the created array
          */
-        @JvmStatic @JvmName("create")
+        @JvmStatic @JvmName("create") @JvmOverloads
         inline operator fun <reified E> invoke(array: Array<E>, copy: Boolean = true): AtomicFastArray64<E> {
             val instance = array[0]
             val scale = getArrayIndexScale(instance)

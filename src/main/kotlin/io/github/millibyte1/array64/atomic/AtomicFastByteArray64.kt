@@ -24,25 +24,28 @@ class AtomicFastByteArray64 : FastByteArray64, AtomicArray64<Byte> {
      * @throws IllegalArgumentException if [size] is not between 1 and [MAX_SIZE]
      */
     constructor(size: Long) : super(size)
+
     /**
      * Creates a new array of the specified [size], with all elements initialized according to the given [init] function.
      * @throws IllegalArgumentException if [size] is not between 1 and [MAX_SIZE]
      */
     constructor(size: Long, init: (Long) -> Byte) : super(size, init)
+
     /**
      * Creates a copy of the given array.
      * @param array the array in question
      */
     constructor(array: FastByteArray64) : this(array.array)
+
     /**
      * Creates a new array from the given FastUtil BigArray, either by copying its contents or simply wrapping it.
      * @param array the array in question
      * @param copy whether to copy (true) the array or directly use it as the internal array (false)
      */
+    @JvmOverloads
     constructor(array: Array<ByteArray>, copy: Boolean = true) : super(array, copy)
 
     override fun copy(): AtomicFastByteArray64 = AtomicFastByteArray64(this)
-
 
     override operator fun get(index: Long): Byte {
         if(index >= this.size || index < 0) throw NoSuchElementException()
@@ -60,7 +63,6 @@ class AtomicFastByteArray64 : FastByteArray64, AtomicArray64<Byte> {
         unsafe.putByteVolatile(inner, offset, value)
     }
 
-
     override fun getAndSet(index: Long, new: Byte): Byte {
         if(index >= this.size || index < 0) throw NoSuchElementException()
         val inner = this.array[BigArrays.segment(index)]
@@ -68,7 +70,6 @@ class AtomicFastByteArray64 : FastByteArray64, AtomicArray64<Byte> {
         val offset = byteOffset(innerIndex, shift, base)
         return getAndSetByte(inner, offset, new)
     }
-
 
     override fun getAndSet(index: Long, transform: (Byte) -> Byte): Byte {
         if(index >= this.size || index < 0) throw NoSuchElementException()
@@ -83,7 +84,6 @@ class AtomicFastByteArray64 : FastByteArray64, AtomicArray64<Byte> {
         while(!compareAndSwapByte(inner, offset, old, new))
         return old
     }
-
 
     override fun setAndGet(index: Long, transform: (Byte) -> Byte): Byte {
         if(index >= this.size || index < 0) throw NoSuchElementException()
@@ -106,7 +106,6 @@ class AtomicFastByteArray64 : FastByteArray64, AtomicArray64<Byte> {
         val offset = byteOffset(innerIndex, shift, base)
         return compareAndSwapByte(inner, offset, expected, new)
     }
-
 
     override fun compareAndSet(index: Long, new: Byte, predicate: (old: Byte, new: Byte) -> Boolean): Boolean {
         if(index >= this.size || index < 0) throw NoSuchElementException()

@@ -14,14 +14,6 @@ import kotlin.test.assertFalse
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class AtomicFastByteArray64Test {
-    @Test
-    fun testAccuracy() {
-        val nonatomic = FastByteArray64(50) { i -> (i % 8).toByte() }
-        // val atomic = FastAtomicByteArray64(50) { i -> (i % 8).toByte() }
 
-    }
-    @Test
-    fun testAtomicity() {
 
-    }
 }

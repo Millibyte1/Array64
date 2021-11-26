@@ -31,9 +31,9 @@ open class FastLongArray64 : LongArray64 {
         val innerSize = (size % BigArrays.SEGMENT_SIZE).toInt()
         //allocates the array
         array = (
-                if(innerSize == 0) Array(fullArrays) { LongArray(BigArrays.SEGMENT_SIZE) }
-                else Array(fullArrays + 1) { i -> if(i == fullArrays) LongArray(innerSize) else LongArray(BigArrays.SEGMENT_SIZE) }
-                )
+            if(innerSize == 0) Array(fullArrays) { LongArray(BigArrays.SEGMENT_SIZE) }
+            else Array(fullArrays + 1) { i -> if(i == fullArrays) LongArray(innerSize) else LongArray(BigArrays.SEGMENT_SIZE) }
+        )
     }
 
     /**
@@ -60,17 +60,19 @@ open class FastLongArray64 : LongArray64 {
     constructor(array: FastLongArray64) : this(array.array)
 
     /**
-     * Creates a new array from the given FastUtil BigArray, either by copying its contents or simply wrapping it.
+     * Creates a new array from the given 2D array, either by copying its contents or simply wrapping it.
      * @param array the array in question
      * @param copy whether to copy (true) the array or directly use it as the internal array (false)
-     * @throws IllegalArgumentException if [copy] is set to false and [array] contains any inner array larger than BigArrays.SEGMENT_SIZE
+     * @throws IllegalArgumentException if [copy] is set to false and [array] has a non-final inner array with size != BigArrays.SEGMENT_SIZE
+     * or any inner array larger than BigArrays.SEGMENT_SIZE.
      */
     @Suppress("LeakingThis")
     @JvmOverloads
     constructor(array: Array<LongArray>, copy: Boolean = true) {
-        if(!copy && array.any { inner -> inner.size > BigArrays.SEGMENT_SIZE }) {
-            throw IllegalArgumentException("At least one inner array is larger than BigArrays.SEGMENT_SIZE, cannot wrap without copying")
-        }
+        if(!copy && array.withIndex().any { (i, inner) ->
+                                            (i != array.lastIndex && inner.size != BigArrays.SEGMENT_SIZE) ||
+                                            (inner.size > BigArrays.SEGMENT_SIZE)
+        }) throw IllegalArgumentException("At least one inner array has an invalid size, cannot wrap without copying")
         this.size = BigArrays.length(array)
         this.array = if(copy) BigArrays.copy(array) else array
     }

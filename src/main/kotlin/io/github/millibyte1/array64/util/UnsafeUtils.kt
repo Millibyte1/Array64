@@ -22,7 +22,7 @@ inline fun <reified E> getArrayBaseOffset(typeInstance: E): Int {
 /**
  * Gets the value of Unsafe.arrayIndexScale() for an array of type [E].
  * @param typeInstance an instance of type E (necessary in order to supply the Array<E> class to Unsafe)
- * @return the value of arrayBaseOffset()
+ * @return the value of arrayIndexScale()
  */
 inline fun <reified E> getArrayIndexScale(typeInstance: E): Int {
     val arrayClass = Array(1){typeInstance}::class.java

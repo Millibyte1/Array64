@@ -90,7 +90,7 @@ open class FastArray64<E> : Array64<E> {
          * @param copy whether to copy (true) the array or directly use it as the internal array (false)
          * @throws IllegalArgumentException if [copy] is set to false and [array] is larger than BigArrays.SEGMENT_SIZE
          */
-        @JvmStatic @JvmName("Create") @JvmOverloads
+        @JvmStatic @JvmName("create") @JvmOverloads
         inline operator fun <reified E> invoke(array: Array<E>, copy: Boolean = true) = FastArray64(Array(1) { array }, copy)
     }
 

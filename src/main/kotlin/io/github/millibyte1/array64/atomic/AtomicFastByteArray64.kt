@@ -17,7 +17,7 @@ private val shift: Int = 31 - Integer.numberOfLeadingZeros(scale)
  * An extension of the FastByteArray64 class supporting atomic operations such as compareAndSet.
  * Loosely based off the Jetbrains JDK implementation of AtomicReferenceArray.
  */
-class AtomicFastByteArray64 : FastByteArray64, AtomicArray64<Byte> {
+class AtomicFastByteArray64 : FastByteArray64, AtomicByteArray64 {
 
     /**
      * Creates a new array of the specified [size], with all elements initialized to zero.
